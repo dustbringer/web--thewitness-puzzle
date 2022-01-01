@@ -1,5 +1,6 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
+import Container from "./components/Container";
 
 function App() {
   return (
@@ -18,6 +19,10 @@ function App() {
           Learn React
         </a>
       </header>
+      <Container maxWidth="md">
+        Blah lasdmlasdmkal skmdals kdmlask mdlask dmalsk dmaslkd mals
+        kmalskmdals kmals km ldkm
+      </Container>
     </div>
   );
 }
