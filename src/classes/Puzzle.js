@@ -1,12 +1,16 @@
+import { isVertex, isSquare, isEdge } from "../util/puzzle_grid_util"
+
 class Puzzle {
-  constructor(height, width) {
+  constructor(width, height) {
     if (height <= 0 || width <= 0)
       throw new Error("Puzzle Error: Size invalid");
 
-    this.height = height;
     this.width = width;
-    this.grid = [...Array(2 * width + 1)].map((e) =>
-      Array(2 * height + 1).fill(null)
+    this.height = height;
+    this.gridw = 2 * width + 1;
+    this.gridh = 2 * height + 1;
+    this.grid = [...Array(this.gridw)].map((e) =>
+      Array(this.gridh).fill(null)
     );
     console.log(this.grid);
 
@@ -17,13 +21,36 @@ class Puzzle {
   }
 
   // Getter
-  get area() {
-    return this.calcArea();
+  getGrid() {
+    return this.grid;
+  }
+  getWidth() {
+    return this.width;
+  }
+  getHeight() {
+    return this.height;
+  }
+  getType() {
+    return this.type;
+  }
+
+  // Util
+  isInGrid(x, y) {
+    return x >= 0 && x < this.gridw && y >= 0 && y < this.gridh;
+  }
+  isVertexInGrid(x, y) {
+    return this.isInGrid(x, y) && isVertex(x, y);
+  }
+  isSquareInGrid(x, y) {
+    return this.isInGrid(x, y) && isSquare(x, y);
+  }
+  isEdgeInGrid(x, y){
+    return this.isInGrid(x, y) && isEdge(x,y);
   }
 
   // Method
-  calcArea() {
-    return this.height * this.width;
+  setStart(x, y) {
+    return 0;
   }
 }
 
