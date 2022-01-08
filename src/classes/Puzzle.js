@@ -5,12 +5,12 @@ class Puzzle {
 
     this.height = height;
     this.width = width;
-    this.grid = [...Array(2 * height + 1)].map((e) =>
-      Array(2 * width + 1).fill(null)
+    this.grid = [...Array(2 * width + 1)].map((e) =>
+      Array(2 * height + 1).fill(null)
     );
     console.log(this.grid);
 
-    // Set this whenever 
+    // Set this whenever
     this.type = {
       dots: false,
     };
