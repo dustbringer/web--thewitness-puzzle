@@ -1,17 +1,27 @@
 import * as React from "react";
 
-function Intersection2() {
+function Intersection2(props) {
   return (
-    <g>
-      <rect class="cls-1" width="58.28" height="16.56" />
-      <rect
-        class="cls-1"
-        x="20.86"
-        y="62.58"
-        width="58.28"
-        height="16.56"
-        transform="translate(79.14 -20.86) rotate(90)"
-      />
+    <g {...props}>
+      <line
+        x1="50"
+        y1="50"
+        x2="100"
+        y2="50"
+        stroke="black"
+        stroke-width="20"
+        stroke-linecap="round"
+      ></line>
+
+      <line
+        x1="50"
+        y1="50"
+        x2="50"
+        y2="100"
+        stroke="black"
+        stroke-width="20"
+        stroke-linecap="round"
+      ></line>
     </g>
   );
 }

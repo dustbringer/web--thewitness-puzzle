@@ -6,6 +6,7 @@ import Cap3 from "./Cap3";
 import Edge from "./Edge";
 import EndCorner from "./EndCorner";
 import EndEdge from "./EndEdge";
+import EndIntersection from "./EndIntersection";
 import Intersection1 from "./Intersection1";
 import Intersection2 from "./Intersection2";
 import Intersection3 from "./Intersection3";
@@ -22,13 +23,14 @@ function PuzzlePiece({ puzzle, x, y }) {
 
   return (
     <svg width="300px" height="300px" viewBox="0 0 500 500">
-      <Break transform="rotate(90, 50, 50)" />
+      {/* <Break transform="rotate(0, 50, 50)" /> */}
       {/* <Cap1 /> */}
       {/* <Cap2 /> */}
       {/* <Cap3 /> */}
-      {/* <Edge /> */}
+      {/* <Edge transform="rotate(0, 50, 50)"/> */}
       {/* <EndCorner /> */}
       {/* <EndEdge /> */}
+      <EndIntersection transform="rotate(0, 50, 50)"/>
       {/* <Intersection1 /> */}
       {/* <Intersection2 /> */}
       {/* <Intersection3 /> */}

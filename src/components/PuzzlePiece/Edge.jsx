@@ -1,13 +1,12 @@
 import * as React from "react";
 
-function Edge() {
+function Edge(props) {
   return (
-    <g>
+    <g {...props}>
       <rect
-        y="41.72"
+        y={50 - 16.56 / 2}
         width="100"
         height="16.56"
-        transform="translate(58.28) rotate(90)"
       />
     </g>
   );

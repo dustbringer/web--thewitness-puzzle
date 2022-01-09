@@ -1,18 +1,26 @@
 import * as React from "react";
 
-function EndEdge() {
+function EndEdge(props) {
   return (
-    <g>
-      <rect
-        y="41.72"
-        width="100"
-        height="16.56"
-        transform="translate(58.28) rotate(90)"
-      />
-      <path
-        d="M85.34,50a8.27,8.27,0,0,1-7.75,8.26H58.28V41.73H77.59A8.27,8.27,0,0,1,85.34,50Z"
-        transform="translate(-41.72)"
-      />
+    <g {...props}>
+      <line
+        x1="0"
+        y1="50"
+        x2="100"
+        y2="50"
+        stroke="black"
+        stroke-width="20"
+      ></line>
+
+      <line
+        x1="50"
+        y1="20"
+        x2="50"
+        y2="50"
+        stroke="black"
+        stroke-width="20"
+        stroke-linecap="round"
+      ></line>
     </g>
   );
 }

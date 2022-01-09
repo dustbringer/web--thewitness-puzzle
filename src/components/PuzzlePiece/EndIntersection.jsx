@@ -1,6 +1,6 @@
 import * as React from "react";
 
-function Intersection3(props) {
+function EndIntersection(props) {
   return (
     <g {...props}>
       <line
@@ -16,12 +16,13 @@ function Intersection3(props) {
         x1="50"
         y1="0"
         x2="50"
-        y2="50"
+        y2="80"
         stroke="black"
         stroke-width="20"
+        stroke-linecap="round"
       ></line>
     </g>
   );
 }
 
-export default Intersection3;
+export default EndIntersection;
