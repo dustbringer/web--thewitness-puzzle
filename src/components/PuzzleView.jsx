@@ -23,8 +23,14 @@ function PuzzleView({ puzzle }) {
   const viewh = (PIECESZ / 2) * (puzzle.gridh + 1);
   const vieww = (PIECESZ / 2) * (puzzle.gridw + 1);
 
+  const sizeRatio = (puzzle.gridh + 1) / (puzzle.gridw + 1);
+
   return (
-    <svg width="500px" height="500px" viewBox={`0 0 ${viewh} ${vieww}`}>
+    <svg
+      width="500px"
+      height={`${500 * sizeRatio}px`}
+      viewBox={`0 0 ${vieww} ${viewh}`}
+    >
       {puzzle.grid.map((col, i1) => (
         <React.Fragment key={`Fragment${i1}`}>
           {col.map((e, i2) => (
