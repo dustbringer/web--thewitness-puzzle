@@ -20,6 +20,13 @@ function PuzzleView({ puzzle }) {
 
   return (
     <svg width="150px" height="150px" viewBox="0 0 500 500">
+      {puzzle.grid.map((row, i1) => (
+        <>
+          {row.map((e, i2) => (
+            <PuzzlePiece key={`${i1}${i2}`} puzzle={puzzle} x={i1} y={i2} />
+          ))}
+        </>
+      ))}
       <PuzzlePiece puzzle={puzzle} x={1} y={0} />
       <PuzzlePiece puzzle={puzzle} x={0} y={1} />
     </svg>
