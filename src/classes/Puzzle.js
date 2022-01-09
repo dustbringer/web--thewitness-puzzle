@@ -80,7 +80,6 @@ class Puzzle {
   }
 
   addEnd(x, y) {
-    // TODO: Check if END overlaps with a BREAK, shouldnt happen
     if (
       !this.isInGrid(x, y) ||
       !this.isSideOfGrid(x, y) ||
@@ -132,7 +131,6 @@ class Puzzle {
     ) {
       throw new Error("Puzzle Error: Failed to add symbol to edge");
     }
-    // TODO: Check if BREAK overlaps with an END, shouldnt happen
 
     if (this.grid[x][y]) this.grid[x][y].sym = sym;
     else this.grid[x][y] = { sym };
