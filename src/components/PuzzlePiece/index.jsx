@@ -14,8 +14,7 @@ import Start from "./Start";
 
 import Puzzle from "../../classes/Puzzle";
 import { VtxSym, SpcSym, EdgSym } from "../../enums/Sym";
-
-const PIECESZ = 100;
+import { PIECESZ } from "./info";
 
 const getEndRot = (puzzle, x, y) => {
   if (x === 0) {
