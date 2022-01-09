@@ -1,15 +1,25 @@
 import * as React from "react";
 
-function Intersection4() {
+function Intersection4(props) {
   return (
-    <g>
-      <rect y="41.72" width="100" height="16.56" />
-      <rect
-        y="41.72"
-        width="100"
-        height="16.56"
-        transform="translate(100 0) rotate(90)"
-      />
+    <g {...props}>
+      <line
+        x1="0"
+        y1="50"
+        x2="100"
+        y2="50"
+        stroke="black"
+        stroke-width="20"
+      ></line>
+
+      <line
+        x1="50"
+        y1="0"
+        x2="50"
+        y2="100"
+        stroke="black"
+        stroke-width="20"
+      ></line>
     </g>
   );
 }
