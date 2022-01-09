@@ -58,7 +58,9 @@ class Puzzle {
     return this.isInGrid(x, y) && this.grid[x][y] && this.grid[x][y].isEnd;
   }
   checkSymbol(x, y, sym) {
-    return this.isInGrid(x, y) && this.grid[x][y] && this.grid[x][y].sym === sym;
+    return (
+      this.isInGrid(x, y) && this.grid[x][y] && this.grid[x][y].sym === sym
+    );
   }
 
   // Method
@@ -72,8 +74,9 @@ class Puzzle {
       throw new Error("Puzzle Error: Failed to set start");
     }
     this.start.push({ x, y });
-    // TODO: do not replace grid object
-    this.grid[x][y] = { isStart: true };
+
+    if (this.grid[x][y]) this.grid[x][y].isStart = true;
+    else this.grid[x][y] = { isStart: true };
   }
 
   addEnd(x, y) {
@@ -83,13 +86,15 @@ class Puzzle {
       !this.isSideOfGrid(x, y) ||
       (this.grid[x][y] &&
         this.grid[x][y].hasOwnProperty("isStart") &&
-        this.grid[x][y].isStart)
+        this.grid[x][y].isStart) ||
+      (this.grid[x][y] && this.grid[x][y].sym === EdgSym.break) // Block END on BREAK
     ) {
       throw new Error("Puzzle Error: Failed to set end");
     }
     this.end.push({ x, y });
-    // TODO: do not replace grid object
-    this.grid[x][y] = { isEnd: true };
+
+    if (this.grid[x][y]) this.grid[x][y].isEnd = true;
+    else this.grid[x][y] = { isEnd: true };
   }
 
   addVtxSym(x, y, sym) {
@@ -101,7 +106,8 @@ class Puzzle {
       throw new Error("Puzzle Error: Failed to add symbol to vertex");
     }
 
-    this.grid[x][y] = { sym };
+    if (this.grid[x][y]) this.grid[x][y].sym = sym;
+    else this.grid[x][y] = { sym };
   }
 
   addSpcSym(x, y, sym) {
@@ -113,20 +119,23 @@ class Puzzle {
       throw new Error("Puzzle Error: Failed to add symbol to space");
     }
 
-    this.grid[x][y] = { sym };
+    if (this.grid[x][y]) this.grid[x][y].sym = sym;
+    else this.grid[x][y] = { sym };
   }
 
   addEdgSym(x, y, sym) {
     if (
       !this.isEdgeInGrid(x, y) ||
       sym === undefined ||
-      !(sym in Object.values(EdgSym))
+      !(sym in Object.values(EdgSym)) ||
+      (sym === EdgSym.break && this.grid[x][y] && this.grid[x][y].isEnd) // Block BREAK on END
     ) {
       throw new Error("Puzzle Error: Failed to add symbol to edge");
     }
     // TODO: Check if BREAK overlaps with an END, shouldnt happen
 
-    this.grid[x][y] = { sym };
+    if (this.grid[x][y]) this.grid[x][y].sym = sym;
+    else this.grid[x][y] = { sym };
   }
 
   removeEdge(x, y) {
