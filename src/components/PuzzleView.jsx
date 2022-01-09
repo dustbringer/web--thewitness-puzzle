@@ -20,9 +20,9 @@ function PuzzleView({ puzzle }) {
 
   return (
     <svg width="500px" height="500px" viewBox="0 0 900 900">
-      {puzzle.grid.map((row, i1) => (
+      {puzzle.grid.map((col, i1) => (
         <React.Fragment key={`Fragment${i1}`}>
-          {row.map((e, i2) => (
+          {col.map((e, i2) => (
             <PuzzlePiece key={`${i1}${i2}`} puzzle={puzzle} x={i1} y={i2} />
           ))}
         </React.Fragment>
