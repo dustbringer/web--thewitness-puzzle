@@ -1,6 +1,6 @@
 import * as React from "react";
 
-function Intersection3(props) {
+function EdgeSquare(props) {
   return (
     <g {...props}>
       <line
@@ -11,17 +11,8 @@ function Intersection3(props) {
         stroke="black"
         stroke-width="20"
       ></line>
-
-      <line
-        x1="50"
-        y1="0"
-        x2="50"
-        y2="50"
-        stroke="black"
-        stroke-width="20"
-      ></line>
     </g>
   );
 }
 
-export default Intersection3;
+export default EdgeSquare;

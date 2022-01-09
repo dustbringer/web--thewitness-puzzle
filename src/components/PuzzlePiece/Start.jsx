@@ -1,9 +1,9 @@
 import * as React from "react";
 
-function Start() {
+function Start(props) {
   return (
-    <g>
-      <circle cx="50" cy="50" r="50" />
+    <g {...props}>
+      <circle cx="50" cy="50" r="25" />
     </g>
   );
 }

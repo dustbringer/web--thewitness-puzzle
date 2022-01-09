@@ -17,17 +17,12 @@ function PuzzleView({ puzzle }) {
     console.error(`Error: Puzzle is ${puzzle}`);
     return <p>Puzzle Failed to load</p>;
   }
-  // const p = new Puzzle(1, 4);
-  // p.addStart(0, 0);
-  // p.addEnd(2, 8);
-  // p.addEdgSym(0, 1, EdgSym.break);
-  // p.addVtxSym(0, 2, VtxSym.dot);
-  // p.addSpcSym(1, 1, SpcSym.sun);
 
   return (
-    <FixedSizeDiv>
-      <PuzzlePiece puzzle={puzzle} x={1} y={1} />
-    </FixedSizeDiv>
+    <svg width="150px" height="150px" viewBox="0 0 500 500">
+      <PuzzlePiece puzzle={puzzle} x={1} y={0} />
+      <PuzzlePiece puzzle={puzzle} x={0} y={1} />
+    </svg>
   );
 }
 
