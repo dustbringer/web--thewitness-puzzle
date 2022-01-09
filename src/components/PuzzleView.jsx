@@ -1,8 +1,16 @@
 import * as React from "react";
+import { styled } from "@mui/material/styles";
+import MUIContainer from "@mui/material/Container";
+
 import PuzzlePiece from "./PuzzlePiece";
 
 import Puzzle from "../classes/Puzzle";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
+
+const FixedSizeDiv = styled("div")`
+  // height: 1000px;
+  // width: 1000px;
+`;
 
 function PuzzleView({ puzzle }) {
   if (!puzzle) {
@@ -17,9 +25,9 @@ function PuzzleView({ puzzle }) {
   // p.addSpcSym(1, 1, SpcSym.sun);
 
   return (
-    <div>
+    <FixedSizeDiv>
       <PuzzlePiece puzzle={puzzle} x={1} y={1} />
-    </div>
+    </FixedSizeDiv>
   );
 }
 

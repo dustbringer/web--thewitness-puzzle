@@ -1,10 +1,10 @@
 import * as React from "react";
 
-function Break() {
+function Break(props) {
   return (
-    <g>
-      <rect width="33.01" height="16.56" />
-      <rect x="67.22" width="32.78" height="16.56" />
+    <g {...props}>
+      <rect y={50 - 16.56 / 2} width="33.33" height="16.56" />
+      <rect x="66.67" y={50 - 16.56 / 2} width="33.33" height="16.56" />
     </g>
   );
 }

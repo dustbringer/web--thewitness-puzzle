@@ -10,7 +10,7 @@ import Puzzle from "./classes/Puzzle";
 import { VtxSym, SpcSym, EdgSym } from "./enums/Sym";
 
 function App() {
-  const p = new Puzzle(1, 4);
+  const p = new Puzzle(4, 4);
   p.addStart(0, 0);
   p.addEnd(2, 8);
   p.addEdgSym(0, 1, EdgSym.break);
