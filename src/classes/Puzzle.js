@@ -72,13 +72,14 @@ class Puzzle {
       throw new Error("Puzzle Error: Failed to set start");
     }
     this.start.push({ x, y });
-    // todo: do not replace grid object
+    // TODO: do not replace grid object
     this.grid[x][y] = { isStart: true };
   }
 
   addEnd(x, y) {
+    // TODO: Check if END overlaps with a BREAK, shouldnt happen
     if (
-      !this.isVertexInGrid(x, y) ||
+      !this.isInGrid(x, y) ||
       !this.isSideOfGrid(x, y) ||
       (this.grid[x][y] &&
         this.grid[x][y].hasOwnProperty("isStart") &&
@@ -87,7 +88,7 @@ class Puzzle {
       throw new Error("Puzzle Error: Failed to set end");
     }
     this.end.push({ x, y });
-    // todo: do not replace grid object
+    // TODO: do not replace grid object
     this.grid[x][y] = { isEnd: true };
   }
 
@@ -123,6 +124,7 @@ class Puzzle {
     ) {
       throw new Error("Puzzle Error: Failed to add symbol to edge");
     }
+    // TODO: Check if BREAK overlaps with an END, shouldnt happen
 
     this.grid[x][y] = { sym };
   }

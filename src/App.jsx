@@ -13,6 +13,8 @@ function App() {
   const p = new Puzzle(4, 4);
   p.addStart(8, 4);
   p.addEnd(2, 8);
+  p.addEnd(0, 0);
+  p.addEnd(3, 8);
   p.addEdgSym(0, 1, EdgSym.break);
   p.addEdgSym(1, 0, EdgSym.break);
   p.addEdgSym(2, 1, EdgSym.break);

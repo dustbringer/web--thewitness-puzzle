@@ -1,6 +1,6 @@
 import * as React from "react";
 
-// todo: break outside edge rounded
+// TODO: break outside edge rounded
 function Break(props) {
   return (
     <g {...props}>
