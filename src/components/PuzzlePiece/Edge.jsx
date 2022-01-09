@@ -1,14 +1,16 @@
 import * as React from "react";
 
-function Edge() {
+function Edge(props) {
   return (
-    <g>
-      <rect
-        y="41.72"
-        width="100"
-        height="16.56"
-        transform="translate(58.28) rotate(90)"
-      />
+    <g {...props}>
+      <line
+        x1="0"
+        y1="50"
+        x2="100"
+        y2="50"
+        stroke="black"
+        stroke-width="20"
+      ></line>
     </g>
   );
 }

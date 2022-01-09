@@ -1,14 +1,25 @@
 import * as React from "react";
 
-function EndCorner() {
+function EndCorner(props) {
   return (
-    <g>
-      <path
-        d="M14.66,50a8.27,8.27,0,0,1,7.75-8.26H41.72V58.27H22.41A8.27,8.27,0,0,1,14.66,50Z"
-        transform="translate(-14.66 -41.73)"
-      />
-      <rect x="27.06" width="58.28" height="16.56" />
-      <rect x="27.06" width="16.56" height="58.28" />
+    <g {...props}>
+      <line
+        x1="20"
+        y1="50"
+        x2="100"
+        y2="50"
+        stroke="black"
+        stroke-width="20"
+        stroke-linecap="round"
+      ></line>
+      <line
+        x1="50"
+        y1="50"
+        x2="50"
+        y2="100"
+        stroke="black"
+        stroke-width="20"
+      ></line>
     </g>
   );
 }

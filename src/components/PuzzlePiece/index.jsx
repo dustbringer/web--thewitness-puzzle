@@ -22,7 +22,7 @@ function PuzzlePiece({ puzzle, x, y }) {
 
   return (
     <svg width="300px" height="300px" viewBox="0 0 500 500">
-      <Break transform="rotate(90, 50, 50)" />
+      {/* <Break transform="rotate(600, 50, 50)" /> */}
       {/* <Cap1 /> */}
       {/* <Cap2 /> */}
       {/* <Cap3 /> */}
