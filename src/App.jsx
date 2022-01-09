@@ -1,6 +1,9 @@
 import "./App.css";
 
 import Container from "./components/Container";
+import PuzzleView from "./components/PuzzleView";
+
+import breakSVG from "./visuals/break.svg";
 
 import Puzzle from "./classes/Puzzle";
 import { VtxSym, SpcSym, EdgSym } from "./enums/Sym";
@@ -16,10 +19,10 @@ function App() {
   console.log(p.grid);
 
   return (
-    <div className="App">
+    <div>
       <Container maxWidth="md">
-        Blah lasdmlasdmkal skmdals kdmlask mdlask dmalsk dmaslkd mals
-        kmalskmdals kmals km ldkm
+        asdasjkdnakjsndsad
+        <PuzzleView puzzle={p} />
       </Container>
     </div>
   );
