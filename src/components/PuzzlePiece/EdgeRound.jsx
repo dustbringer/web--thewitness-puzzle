@@ -9,8 +9,8 @@ function EdgeRound(props) {
         x2="100"
         y2="50"
         stroke="black"
-        stroke-width="20"
-        stroke-linecap="round"
+        strokeWidth="20"
+        strokeLinecap="round"
       ></line>
     </g>
   );

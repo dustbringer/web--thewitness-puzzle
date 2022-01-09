@@ -9,8 +9,8 @@ function End(props) {
         x2="50"
         y2="50"
         stroke="black"
-        stroke-width="20"
-        stroke-linecap="round"
+        strokeWidth="20"
+        strokeLinecap="round"
       ></line>
     </g>
   );

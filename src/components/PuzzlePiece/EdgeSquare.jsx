@@ -9,7 +9,7 @@ function EdgeSquare(props) {
         x2="100"
         y2="50"
         stroke="black"
-        stroke-width="20"
+        strokeWidth="20"
       ></line>
     </g>
   );

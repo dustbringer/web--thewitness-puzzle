@@ -51,6 +51,15 @@ class Puzzle {
   isSideOfGrid(x, y) {
     return x === 0 || x === this.gridw - 1 || y === 0 || y === this.gridh - 1;
   }
+  isStart(x, y) {
+    return this.isInGrid(x, y) && this.grid[x][y] && this.grid[x][y].isStart;
+  }
+  isEnd(x, y) {
+    return this.isInGrid(x, y) && this.grid[x][y] && this.grid[x][y].isEnd;
+  }
+  checkSymbol(x, y, sym) {
+    return this.isInGrid(x, y) && this.grid[x][y] && this.grid[x][y].sym === sym;
+  }
 
   // Method
   addStart(x, y) {

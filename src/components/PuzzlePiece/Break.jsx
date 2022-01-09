@@ -1,5 +1,6 @@
 import * as React from "react";
 
+// todo: break outside edge rounded
 function Break(props) {
   return (
     <g {...props}>
@@ -9,7 +10,7 @@ function Break(props) {
         x2="33.33"
         y2="50"
         stroke="black"
-        stroke-width="20"
+        strokeWidth="20"
       ></line>
       <line
         x1="66.67"
@@ -17,7 +18,7 @@ function Break(props) {
         x2="100"
         y2="50"
         stroke="black"
-        stroke-width="20"
+        strokeWidth="20"
       ></line>
     </g>
   );
