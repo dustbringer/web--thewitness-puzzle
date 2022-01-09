@@ -3,6 +3,7 @@ import { styled } from "@mui/material/styles";
 import MUIContainer from "@mui/material/Container";
 
 import PuzzlePiece from "./PuzzlePiece";
+import { PIECESZ } from "./PuzzlePiece/info";
 
 import Puzzle from "../classes/Puzzle";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
@@ -18,8 +19,12 @@ function PuzzleView({ puzzle }) {
     return <p>Puzzle Failed to load</p>;
   }
 
+  // Perfect Viewbox Size
+  const viewh = (PIECESZ / 2) * (puzzle.gridh + 1);
+  const vieww = (PIECESZ / 2) * (puzzle.gridw + 1);
+
   return (
-    <svg width="500px" height="500px" viewBox="0 0 900 900">
+    <svg width="500px" height="500px" viewBox={`0 0 ${viewh} ${vieww}`}>
       {puzzle.grid.map((col, i1) => (
         <React.Fragment key={`Fragment${i1}`}>
           {col.map((e, i2) => (
