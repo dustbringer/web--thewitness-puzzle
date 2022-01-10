@@ -1,6 +1,6 @@
 import * as React from "react";
 import { styled } from "@mui/material/styles";
-import PointerLocker from 'react-pointerlock';
+import PointerLocker from "react-pointerlock";
 
 import PuzzleGrid from "./PuzzleGrid";
 import PuzzleLine from "./PuzzleLine";
@@ -37,25 +37,32 @@ function Puzzle({ puzzle }) {
     cursor: pointer;
   `;
 
-  const onMouseMove = (movement) => {
-    let x = movement.x;
-    let y = movement.y;
+  // const onMouseMove = (e) => {
+  //   console.log(e);
+  //   // let x = movement.x;
+  //   // let y = movement.y;
 
-    console.log({x, y});
-  }
+  //   // console.log(x, y);
+  // };
 
   return (
     <>
       <Root>
         {/* <StartButton top={`${relativePieceSize * 4}`} left={`${relativePieceSize * 9}`}></StartButton> */}
         {puzzle.start.map((e, i) => (
-          
-        <PointerLocker key={`${i}`} onClick={onMouseMove}>
-          <StartButton 
-            top={`${(relativePieceSize / 2) * e.y + relativePieceSize / 2 - relativeStartRad}`}
-            left={`${(relativePieceSize / 2) * e.x + relativePieceSize / 2 - relativeStartRad}`}
+          <StartButton
+            key={`${i}`}
+            top={`${
+              (relativePieceSize / 2) * e.y +
+              relativePieceSize / 2 -
+              relativeStartRad
+            }`}
+            left={`${
+              (relativePieceSize / 2) * e.x +
+              relativePieceSize / 2 -
+              relativeStartRad
+            }`}
           ></StartButton>
-          </PointerLocker>
         ))}
       </Root>
       <svg
@@ -65,7 +72,6 @@ function Puzzle({ puzzle }) {
       >
         <PuzzleGrid puzzle={puzzle} />
         <PuzzleLine puzzle={puzzle} />
-
       </svg>
     </>
   );
