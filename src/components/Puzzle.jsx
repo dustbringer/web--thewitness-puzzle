@@ -22,22 +22,24 @@ function Puzzle({ puzzle }) {
   const pixelsPerUnit = 500 / vieww;
   const relativePieceSize = PIECESZ * pixelsPerUnit; // In pixels
 
-  const StartContainer = styled("div")`
+  const Root = styled("div")`
     position: relative;
   `;
+
   const StartButton = styled("div")`
     width: ${STARTRAD * 2 * pixelsPerUnit}px;
     height: ${STARTRAD * 2 * pixelsPerUnit}px;
     position: absolute;
     left: 0;
+    top: 0;
     background-color: red;
   `;
 
   return (
     <>
-      <div>
+      <Root>
         <StartButton></StartButton>
-      </div>
+      </Root>
       <svg
         width="500px"
         height={`${500 * sizeRatio}px`}
