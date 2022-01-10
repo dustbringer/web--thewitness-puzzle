@@ -1,6 +1,5 @@
 import * as React from "react";
 import { styled } from "@mui/material/styles";
-import PointerLocker from "react-pointerlock";
 
 import PuzzleGrid from "./PuzzleGrid";
 import PuzzleLine from "./PuzzleLine";
@@ -45,10 +44,18 @@ function Puzzle({ puzzle }) {
   //   // console.log(x, y);
   // };
 
+  const handleStartClick = (e, x, y) => {
+    const div = e.target;
+    div.requestPointerLock =
+      div.requestPointerLock || div.mozRequestPointerLock;
+
+    div.requestPointerLock();
+
+  };
+
   return (
     <>
       <Root>
-        {/* <StartButton top={`${relativePieceSize * 4}`} left={`${relativePieceSize * 9}`}></StartButton> */}
         {puzzle.start.map((e, i) => (
           <StartButton
             key={`${i}`}
@@ -62,6 +69,7 @@ function Puzzle({ puzzle }) {
               relativePieceSize / 2 -
               relativeStartRad
             }`}
+            onClick={(ev) => handleStartClick(ev, e.x, e.y)}
           ></StartButton>
         ))}
       </Root>
