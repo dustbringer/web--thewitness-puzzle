@@ -73,13 +73,13 @@ function PuzzlePiece({ puzzle, x, y }) {
   return (
     <>
       {/* Render Vertex */}
-      {isVertex(x, y) && <Vertex puzzle={puzzle} x={x} y={y}></Vertex>}
+      {isVertex(x, y) && <Vertex puzzle={puzzle} x={x} y={y} />}
 
       {/* Render Space */}
-      {isSpace(x, y) && <Space puzzle={puzzle} x={x} y={y}></Space>}
+      {isSpace(x, y) && <Space puzzle={puzzle} x={x} y={y} />}
 
       {/* Render Edge */}
-      {isEdge(x, y) && <Edge puzzle={puzzle} x={x} y={y}></Edge>}
+      {isEdge(x, y) && <Edge puzzle={puzzle} x={x} y={y} />}
 
       {puzzle.isEnd(x, y) && (
         <End
