@@ -8,7 +8,62 @@ import PuzzleClass from "../classes/Puzzle";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
 import { PIECESZ, STARTRAD } from "./PuzzlePiece/info";
 
+const Root = styled("div")`
+  position: relative;
+`;
+
 function Puzzle({ puzzle }) {
+  // Using refs, since state doesnt interact well with event listeners
+  const pointerLocked = React.useRef(false);
+
+  // Using a list of Refs - https://caseyyee.com/blog/react-ref-collections/
+  const startRefs = React.useRef([]);
+
+  // Pointer lock code from here
+  // https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API
+  // https://github.com/mdn/dom-examples/blob/master/pointer-lock/app.js
+  React.useEffect(() => {
+    startRefs.current.forEach((element) => {
+      element.requestPointerLock =
+        element.requestPointerLock || element.mozRequestPointerLock;
+    });
+
+    document.exitPointerLock =
+      document.exitPointerLock || document.mozExitPointerLock;
+
+    const lockExit = () => document.exitPointerLock();
+
+    const lockChangeAlert = () => {
+      console.log("lockchangealert");
+      if (
+        startRefs.current.includes(document.pointerLockElement) ||
+        startRefs.current.includes(document.mozPointerLockElement)
+      ) {
+        console.log("The pointer lock status is now locked");
+        document.addEventListener("mousemove", updatePosition, false);
+        document.addEventListener("click", lockExit, false);
+        pointerLocked.current = true;
+      } else {
+        console.log("The pointer lock status is now unlocked");
+        document.removeEventListener("mousemove", updatePosition, false);
+        document.removeEventListener("click", lockExit, false);
+        pointerLocked.current = false;
+      }
+    };
+
+    if ("onpointerlockchange" in document) {
+      document.addEventListener("pointerlockchange", lockChangeAlert, false);
+    } else if ("onmozpointerlockchange" in document) {
+      document.addEventListener("mozpointerlockchange", lockChangeAlert, false);
+    }
+
+    const lockError = (e) => {
+      console.error("Pointer lock failed, try again.");
+    };
+    document.addEventListener("pointerlockerror", lockError, false);
+    document.addEventListener("mozpointerlockerror", lockError, false);
+  }, []);
+
   if (!puzzle) {
     console.error(`Error: Puzzle is ${puzzle}`);
     return <p>Puzzle Failed to load</p>;
@@ -23,10 +78,6 @@ function Puzzle({ puzzle }) {
   const relativePieceSize = PIECESZ * pixelsPerUnit; // In pixels
   const relativeStartRad = STARTRAD * pixelsPerUnit; // In pixels
 
-  const Root = styled("div")`
-    position: relative;
-  `;
-
   const StartButton = styled("div")`
     width: ${relativeStartRad * 2}px;
     height: ${relativeStartRad * 2}px;
@@ -36,21 +87,15 @@ function Puzzle({ puzzle }) {
     cursor: pointer;
   `;
 
-  // const onMouseMove = (e) => {
-  //   console.log(e);
-  //   // let x = movement.x;
-  //   // let y = movement.y;
+  const updatePosition = (e) => {
+    console.log(e);
+  };
 
-  //   // console.log(x, y);
-  // };
+  const handleStartClick = (e, x, y, i) => {
+    if (pointerLocked.current) return;
 
-  const handleStartClick = (e, x, y) => {
     const div = e.target;
-    div.requestPointerLock =
-      div.requestPointerLock || div.mozRequestPointerLock;
-
     div.requestPointerLock();
-
   };
 
   return (
@@ -59,6 +104,7 @@ function Puzzle({ puzzle }) {
         {puzzle.start.map((e, i) => (
           <StartButton
             key={`${i}`}
+            ref={(ref) => startRefs.current.push(ref)}
             top={`${
               (relativePieceSize / 2) * e.y +
               relativePieceSize / 2 -
@@ -69,7 +115,7 @@ function Puzzle({ puzzle }) {
               relativePieceSize / 2 -
               relativeStartRad
             }`}
-            onClick={(ev) => handleStartClick(ev, e.x, e.y)}
+            onClick={(ev) => handleStartClick(ev, e.x, e.y, i)}
           ></StartButton>
         ))}
       </Root>
