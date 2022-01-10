@@ -66,7 +66,7 @@ class Puzzle {
   // Method
   addStart(x, y) {
     if (
-      !this.isVertexInGrid(x, y) ||
+      (!this.isVertexInGrid(x, y) && !this.isEdgeInGrid(x, y)) ||
       (this.grid[x][y] &&
         this.grid[x][y].hasOwnProperty("isEnd") &&
         this.grid[x][y].isEnd)

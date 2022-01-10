@@ -30,14 +30,7 @@ const getEndRot = (puzzle, x, y) => {
 
 /* ONLY RUN THIS ON VERTICES */
 function Vertex({ puzzle, x, y }) {
-  return puzzle.isStart(x, y) ? (
-    // Render start
-    <Start
-      transform={`translate(${(PIECESZ / 2) * x}, ${(PIECESZ / 2) * y})`}
-    />
-  ) : (
-    <></>
-  );
+  return <></>;
 }
 
 /* ONLY RUN THIS ON EDGES */
@@ -80,6 +73,12 @@ function PuzzlePiece({ puzzle, x, y }) {
 
       {/* Render Edge */}
       {isEdge(x, y) && <Edge puzzle={puzzle} x={x} y={y} />}
+
+      {puzzle.isStart(x, y) && (
+        <Start
+          transform={`translate(${(PIECESZ / 2) * x}, ${(PIECESZ / 2) * y})`}
+        />
+      )}
 
       {puzzle.isEnd(x, y) && (
         <End

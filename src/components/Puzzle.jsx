@@ -21,14 +21,15 @@ function Puzzle({ puzzle }) {
 
   const pixelsPerUnit = 500 / vieww;
   const relativePieceSize = PIECESZ * pixelsPerUnit; // In pixels
+  const relativeStartRad = STARTRAD * pixelsPerUnit; // In pixels
 
   const Root = styled("div")`
     position: relative;
   `;
 
   const StartButton = styled("div")`
-    width: ${STARTRAD * 2 * pixelsPerUnit}px;
-    height: ${STARTRAD * 2 * pixelsPerUnit}px;
+    width: ${relativeStartRad * 2}px;
+    height: ${relativeStartRad * 2}px;
     position: absolute;
     background-color: red;
     top: ${(props) => props.top}px;
@@ -38,7 +39,13 @@ function Puzzle({ puzzle }) {
   return (
     <>
       <Root>
-        <StartButton top="10" left="240"></StartButton>
+        {/* <StartButton top={`${relativePieceSize * 4}`} left={`${relativePieceSize * 9}`}></StartButton> */}
+        {puzzle.start.map((e, i) => (
+          <StartButton key={`${i}`}
+            top={`${(relativePieceSize / 2) * e.y + relativePieceSize / 2 - relativeStartRad}`}
+            left={`${(relativePieceSize / 2) * e.x + relativePieceSize / 2 - relativeStartRad}`}
+          ></StartButton>
+        ))}
       </Root>
       <svg
         width="500px"
