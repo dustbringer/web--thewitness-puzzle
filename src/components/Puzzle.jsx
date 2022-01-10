@@ -13,6 +13,9 @@ const Root = styled("div")`
 `;
 
 function Puzzle({ puzzle }) {
+  // Index of start that has been clicked
+  const [activeStart, setActiveStart] = React.useState(-1);
+
   // Using refs, since state doesnt interact well with event listeners
   // https://stackoverflow.com/questions/53845595/wrong-react-hooks-behaviour-with-event-listener
   const pointerLocked = React.useRef(false);
@@ -91,8 +94,11 @@ function Puzzle({ puzzle }) {
     console.log(e);
   };
 
-  const handleStartClick = (e, x, y, i) => {
+  const handleStartClick = (e, i) => {
+    // Stop if already locked to avoid double unlock
     if (pointerLocked.current) return;
+
+    setActiveStart(i);
 
     const div = e.target;
     div.requestPointerLock();
@@ -115,7 +121,7 @@ function Puzzle({ puzzle }) {
               relativePieceSize / 2 -
               relativeStartRad
             }`}
-            onClick={(ev) => handleStartClick(ev, e.x, e.y, i)}
+            onClick={(ev) => handleStartClick(ev, i)}
           ></StartButton>
         ))}
       </Root>
