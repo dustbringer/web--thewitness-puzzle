@@ -8,29 +8,14 @@ import { PIECESZ } from "./PuzzlePiece/info";
 import Puzzle from "../classes/Puzzle";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
 
-const FixedSizeDiv = styled("div")`
-  // height: 1000px;
-  // width: 1000px;
-`;
-
-function PuzzleView({ puzzle }) {
+function PuzzleGrid({ puzzle }) {
   if (!puzzle) {
     console.error(`Error: Puzzle is ${puzzle}`);
     return <p>Puzzle Failed to load</p>;
   }
 
-  // Perfect Viewbox Size
-  const viewh = (PIECESZ / 2) * (puzzle.gridh + 1);
-  const vieww = (PIECESZ / 2) * (puzzle.gridw + 1);
-
-  const sizeRatio = (puzzle.gridh + 1) / (puzzle.gridw + 1);
-
   return (
-    <svg
-      width="500px"
-      height={`${500 * sizeRatio}px`}
-      viewBox={`0 0 ${vieww} ${viewh}`}
-    >
+    <>
       {puzzle.grid.map((col, i1) => (
         <React.Fragment key={`Fragment${i1}`}>
           {col.map((e, i2) => (
@@ -38,8 +23,8 @@ function PuzzleView({ puzzle }) {
           ))}
         </React.Fragment>
       ))}
-    </svg>
+    </>
   );
 }
 
-export default PuzzleView;
+export default PuzzleGrid;

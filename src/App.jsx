@@ -2,15 +2,15 @@ import * as React from "react";
 import "./App.css";
 
 import Container from "./components/Container";
-import PuzzleView from "./components/PuzzleView";
+import Puzzle from "./components/Puzzle";
 
 import breakSVG from "./visuals/break.svg";
 
-import Puzzle from "./classes/Puzzle";
+import PuzzleClass from "./classes/Puzzle";
 import { VtxSym, SpcSym, EdgSym } from "./enums/Sym";
 
 function App() {
-  const p = new Puzzle(7, 8);
+  const p = new PuzzleClass(8, 8);
   p.addStart(8, 4);
   p.addEnd(0, 0);
   p.addEnd(0, 2);
@@ -35,7 +35,7 @@ function App() {
     <div>
       <Container maxWidth="md">
         asdasjkdnakjsndsad
-        <PuzzleView puzzle={p} />
+        <Puzzle puzzle={p} />
       </Container>
     </div>
   );
