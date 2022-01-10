@@ -13,8 +13,16 @@ const Root = styled("div")`
 `;
 
 function Puzzle({ puzzle }) {
+  const Direction = Object.freeze({
+    UP: 0,
+    RIGHT: 1,
+    DOWN: 2,
+    LEFT: 3
+  });
   // Index of start that has been clicked
-  const [activeStart, setActiveStart] = React.useState(-1);
+  const [activeStart, setActiveStart] = React.useState(null);
+  const [currentDir, setCurrentDir] = React.useState(Direction.UP);
+  const [currentDist, setCurrentDist] = React.useState(0);
 
   // Using refs, since state doesnt interact well with event listeners
   // https://stackoverflow.com/questions/53845595/wrong-react-hooks-behaviour-with-event-listener
@@ -98,7 +106,7 @@ function Puzzle({ puzzle }) {
     // Stop if already locked to avoid double unlock
     if (pointerLocked.current) return;
 
-    setActiveStart(i);
+    setActiveStart(puzzle.start[i]);
 
     const div = e.target;
     div.requestPointerLock();

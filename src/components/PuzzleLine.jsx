@@ -5,7 +5,7 @@ import Puzzle from "../classes/Puzzle";
 
 import { PIECESZ } from "./PuzzlePiece/info";
 
-function PuzzleGrid({ puzzle }) {
+function PuzzleLine({ puzzle, points, current }) {
   if (!puzzle) {
     console.error(`Error: Puzzle is ${puzzle}`);
     return <p>Puzzle Failed to load</p>;
@@ -26,4 +26,4 @@ function PuzzleGrid({ puzzle }) {
   );
 }
 
-export default PuzzleGrid;
+export default PuzzleLine;
