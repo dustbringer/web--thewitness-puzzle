@@ -14,6 +14,7 @@ const Root = styled("div")`
 
 function Puzzle({ puzzle }) {
   // Using refs, since state doesnt interact well with event listeners
+  // https://stackoverflow.com/questions/53845595/wrong-react-hooks-behaviour-with-event-listener
   const pointerLocked = React.useRef(false);
 
   // Using a list of Refs - https://caseyyee.com/blog/react-ref-collections/
@@ -34,7 +35,6 @@ function Puzzle({ puzzle }) {
     const lockExit = () => document.exitPointerLock();
 
     const lockChangeAlert = () => {
-      console.log("lockchangealert");
       if (
         startRefs.current.includes(document.pointerLockElement) ||
         startRefs.current.includes(document.mozPointerLockElement)
