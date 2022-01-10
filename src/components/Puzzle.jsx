@@ -17,10 +17,10 @@ function Puzzle({ puzzle }) {
     UP: 0,
     RIGHT: 1,
     DOWN: 2,
-    LEFT: 3
+    LEFT: 3,
   });
   // Index of start that has been clicked
-  const [activeStart, setActiveStart] = React.useState(null);
+  const activeStart = React.useRef(null);
   const [currentDir, setCurrentDir] = React.useState(Direction.UP);
   const [currentDist, setCurrentDist] = React.useState(0);
 
@@ -106,7 +106,7 @@ function Puzzle({ puzzle }) {
     // Stop if already locked to avoid double unlock
     if (pointerLocked.current) return;
 
-    setActiveStart(puzzle.start[i]);
+    activeStart.current = puzzle.start[i];
 
     const div = e.target;
     div.requestPointerLock();
