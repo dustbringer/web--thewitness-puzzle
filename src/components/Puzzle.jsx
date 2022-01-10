@@ -26,19 +26,23 @@ function Puzzle({ puzzle }) {
     position: relative;
   `;
 
+  const startPos = (props) => `
+      top: ${props.top}px;
+      left: ${props.left}px;
+    `;
+
   const StartButton = styled("div")`
     width: ${STARTRAD * 2 * pixelsPerUnit}px;
     height: ${STARTRAD * 2 * pixelsPerUnit}px;
     position: absolute;
-    left: 0;
-    top: 0;
     background-color: red;
+    ${startPos};
   `;
 
   return (
     <>
       <Root>
-        <StartButton></StartButton>
+        <StartButton top="100" left="240"></StartButton>
       </Root>
       <svg
         width="500px"
