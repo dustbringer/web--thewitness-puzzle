@@ -15,7 +15,7 @@ function App() {
   p.addStart(4, 4);
   p.addStart(8, 0);
   p.addStart(0, 0);
-  p.addStart(8, 7);
+  p.addStart(6, 7);
   p.addEnd(0, 2);
   p.addEnd(0, 3);
   p.addEnd(0, 4);
