@@ -6,22 +6,31 @@ import Puzzle from "../classes/Puzzle";
 import { PIECESZ } from "./PuzzlePiece/info";
 
 function PuzzleLine({ puzzle, points, current }) {
+
+  
   if (!puzzle) {
     console.error(`Error: Puzzle is ${puzzle}`);
     return <p>Puzzle Failed to load</p>;
   }
 
   return (
-    <g>
-        <line
-        x1="0"
-        y1="0"
-        x2="0"
-        y2="0"
-        stroke="white"
-        strokeWidth="20"
-        strokeLinecap="round"
-      ></line>
+    <g transform="translate(50, 50)">
+      {points.map((e, i) => {
+        return i === points.length - 1 ? (
+          <></>
+        ) : (
+          <line
+            key={`${i}`}
+            x1={`${e.x * PIECESZ/2}`}
+            y1={`${e.y * PIECESZ/2}`}
+            x2={`${points[i + 1].x * PIECESZ/2}`}
+            y2={`${points[i + 1].y * PIECESZ/2}`}
+            stroke="red"
+            strokeWidth="20"
+            strokeLinecap="round"
+          ></line>
+        );
+      })}
     </g>
   );
 }

@@ -7,10 +7,14 @@ import PuzzleLine from "./PuzzleLine";
 import PuzzleClass from "../classes/Puzzle";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
 import { PIECESZ, STARTRAD } from "./PuzzlePiece/info";
+import { maxWidth } from "@mui/system";
 
 const Root = styled("div")`
   position: relative;
 `;
+
+// TODO: update this
+const EDGESEGMAX = 100;
 
 function Puzzle({ puzzle }) {
   const Direction = Object.freeze({
@@ -21,8 +25,14 @@ function Puzzle({ puzzle }) {
   });
   // Index of start that has been clicked
   const activeStart = React.useRef(null);
-  const [currentDir, setCurrentDir] = React.useState(Direction.UP);
-  const [currentDist, setCurrentDist] = React.useState(0);
+  const linePoints = React.useRef([]);
+  const currDir = React.useRef(Direction.UP);
+  const currDist = React.useRef(0);
+
+  const [pointsDup, setPointsDup] = React.useState([]);
+  React.useEffect(() => {
+    setPointsDup(linePoints.current);
+  }, [linePoints]);
 
   // Using refs, since state doesnt interact well with event listeners
   // https://stackoverflow.com/questions/53845595/wrong-react-hooks-behaviour-with-event-listener
@@ -99,7 +109,59 @@ function Puzzle({ puzzle }) {
   `;
 
   const updatePosition = (e) => {
-    console.log(e);
+    const scaleFactor = 0.3;
+    const x = e.movementX * scaleFactor;
+    const y = e.movementY * scaleFactor;
+
+    // TODO: scale & fine tune speed
+    // TODO: edge case
+    // TODO: moving backwards
+    // TODO: current distance = 100
+
+    // get current direction and magnitude
+    let mouseMag;
+
+    // if currently vertex, update current direction
+    if (currDist.current === 0) {
+      if (Math.abs(x) > Math.abs(y)) {
+        currDir.current = x > 0 ? Direction.RIGHT : Direction.LEFT;
+      } else {
+        currDir.current = y > 0 ? Direction.DOWN : Direction.UP;
+      }
+    }
+
+    if (currDir.current % 2 === 0) {
+      mouseMag = Math.abs(y);
+    } else {
+      mouseMag = Math.abs(x);
+    }
+
+    while (mouseMag > 0) {
+      if (mouseMag + currDist.current > EDGESEGMAX) {
+        mouseMag -= EDGESEGMAX - currDist.current;
+        currDist.current = 0;
+
+        const lastPoint = linePoints.current[linePoints.current.length - 1];
+        switch (currDir.current) {
+          case Direction.UP:
+            linePoints.current.push({ x: lastPoint.x, y: lastPoint.y - 2 });
+            break;
+          case Direction.RIGHT:
+            linePoints.current.push({ x: lastPoint.x + 2, y: lastPoint.y });
+            break;
+          case Direction.DOWN:
+            linePoints.current.push({ x: lastPoint.x, y: lastPoint.y - 2 });
+            break;
+          case Direction.LEFT:
+            linePoints.current.push({ x: lastPoint.x - 2, y: lastPoint.y });
+            break;
+        }
+        console.log(linePoints.current);
+      } else {
+        currDist.current += mouseMag;
+        mouseMag = 0;
+      }
+    }
   };
 
   const handleStartClick = (e, i) => {
@@ -107,6 +169,7 @@ function Puzzle({ puzzle }) {
     if (pointerLocked.current) return;
 
     activeStart.current = puzzle.start[i];
+    linePoints.current = [puzzle.start[i]];
 
     const div = e.target;
     div.requestPointerLock();
@@ -139,7 +202,9 @@ function Puzzle({ puzzle }) {
         viewBox={`0 0 ${vieww} ${viewh}`}
       >
         <PuzzleGrid puzzle={puzzle} />
-        <PuzzleLine puzzle={puzzle} />
+        <PuzzleLine puzzle={puzzle} points={
+          [{x:0,y:0}, {x:2,y:0}, {x:2,y:2}, {x:0,y:2}]
+        } current={{dir: currDir.current, dist: currDist.current}} />
       </svg>
     </>
   );
