@@ -19,6 +19,8 @@ const FixedSVG = styled("svg")`
 
 // TODO: update this
 const EDGESEGMAX = 200;
+const moveCap = 60;
+const assistSpeed = 5;
 
 const StartButton = styled("div")`
   width: ${(props) => props.relativestartrad * 2}px;
@@ -90,12 +92,12 @@ function PuzzleLine({ puzzle }) {
   const relativeStartRad = STARTRAD * pixelsPerUnit; // In pixels
 
   const updatePosition = (e) => {
+
     // TODO: change ref values at end
     // TODO: check valid edge is desired direction
     // TODO: fix up directional switch statement (probably pass in functions)
     // TODO: account for starting position on edge
 
-    const moveCap = 4;
     let x = e.movementX;
     if (Math.abs(x) > moveCap) {
       if (x > 0) x = moveCap;
@@ -106,6 +108,7 @@ function PuzzleLine({ puzzle }) {
       if (y > 0) y = moveCap;
       else y = -moveCap;
     }
+    console.log(`X: ${e.movementX} - ${x} --- Y: ${e.movementY} - ${y}`);
 
     // The larger of the x and y inputs
     const largerDist = Math.abs(x) > Math.abs(y) ? Math.abs(x) : Math.abs(y);
@@ -160,8 +163,6 @@ function PuzzleLine({ puzzle }) {
       if (!outOfBounds(currPoint, currDirRef.current)) {
         // TODO: jumps between directions
         setCurrDist(currDistRef.current + valToAdd);
-      } else {
-        setCurrDist(0);
       }
     } else {
       // add or subtract y based on current direction's positive movement
@@ -195,8 +196,6 @@ function PuzzleLine({ puzzle }) {
 
       // Corner turn assist (moving in a about perpendicular direction to edge)
       if (largerDir % 2 !== currDirRef.current % 2 && largerDist > 1) {
-        // TODO: MAGIC NUMBER
-        const assistSpeed = 1;
         distDiff +=
           currDistRef.current > EDGESEGMAX / 2 ? assistSpeed : -assistSpeed;
       }
@@ -212,9 +211,9 @@ function PuzzleLine({ puzzle }) {
 
       // check if new point should be added
       if (currDistRef.current >= EDGESEGMAX) {
-        // TODO: jumps to centre
-        setCurrDist(0);
+        // TODO: check if direction is valid
         setLinePoints((points) => [...points, nextPoint]);
+        setCurrDist(currDistRef.current - EDGESEGMAX);
       }
     }
 
