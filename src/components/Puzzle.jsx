@@ -107,45 +107,45 @@ function Puzzle({ puzzle }) {
   const relativeStartRad = STARTRAD * pixelsPerUnit; // In pixels
 
   const updatePosition = (e) => {
-    const scaleFactor = 0.8;
-    const x = e.movementX * scaleFactor;
-    const y = e.movementY * scaleFactor;
+    const speed = 0.8;
+    const x = e.movementX * speed;
+    const y = e.movementY * speed;
 
     // TODO: scale & fine tune speed
     // TODO: edge case
     // TODO: moving backwards
     // TODO: current distance = 100
 
-    // get current direction and magnitude
-    let mouseMag,
-      mouseDist = currDistRef.current;
+    let mouseMag, // magnitude of this mouse input (in one of x or y direction)
+      mouseDir = currDirRef.current, // copy of stored curr direction
+      mouseDist = currDistRef.current; // copy of stored curr distance
 
     // if currently vertex, update current direction
-    if (currDistRef.current === 0) {
+    if (mouseDist === 0) {
       if (Math.abs(x) > Math.abs(y)) {
-        setCurrDir(x > 0 ? Direction.RIGHT : Direction.LEFT);
+        mouseDir = x > 0 ? Direction.RIGHT : Direction.LEFT;
       } else {
-        setCurrDir(y > 0 ? Direction.DOWN : Direction.UP);
+        mouseDir = y > 0 ? Direction.DOWN : Direction.UP;
       }
     }
 
-    if (currDirRef.current % 2 === 0) {
+    if (mouseDir % 2 === 0) {
       mouseMag = Math.abs(y);
     } else {
       mouseMag = Math.abs(x);
     }
 
-    // console.log(mouseMag, mouseDist);
-
     while (mouseMag > 0) {
       if (mouseMag + mouseDist > EDGESEGMAX) {
+        // Take off enough from mouseMag to max out mouseDist
         mouseMag -= EDGESEGMAX - mouseDist;
         mouseDist = 0;
 
+        // Add new point to array
         const lastPoint =
           linePointsRef.current[linePointsRef.current.length - 1];
         if (lastPoint) {
-          switch (currDirRef.current) {
+          switch (mouseDir) {
             case Direction.UP:
               setLinePoints((curr) => [
                 ...curr,
@@ -161,7 +161,7 @@ function Puzzle({ puzzle }) {
             case Direction.DOWN:
               setLinePoints((curr) => [
                 ...curr,
-                { x: lastPoint.x, y: lastPoint.y - 2 },
+                { x: lastPoint.x, y: lastPoint.y + 2 },
               ]);
               break;
             case Direction.LEFT:
@@ -180,7 +180,7 @@ function Puzzle({ puzzle }) {
       }
     }
 
-    // console.log(mouseMag, mouseDist);
+    setCurrDir(mouseDir);
     setCurrDist(mouseDist);
     // console.log(e.movementX, e.movementY);
   };
