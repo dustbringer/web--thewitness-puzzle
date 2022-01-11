@@ -97,6 +97,18 @@ function PuzzleLine({ puzzle }) {
 
     const x = e.movementX;
     const y = e.movementY;
+
+    // The larger of the x and y inputs
+    const largerDist = Math.abs(x) > Math.abs(y) ? Math.abs(x) : Math.abs(y);
+    const largerDir =
+      Math.abs(x) > Math.abs(y)
+        ? x > 0
+          ? Direction.RIGHT
+          : Direction.LEFT
+        : y > 0
+        ? Direction.DOWN
+        : Direction.UP;
+
     let currPoint = null;
     if (linePointsRef.current.length > 0)
       currPoint = linePointsRef.current[linePointsRef.current.length - 1];
@@ -116,7 +128,7 @@ function PuzzleLine({ puzzle }) {
     // TODO: cap x && y
 
     // vertex
-    if (currDistRef.current <= 8) {
+    if (currDistRef.current <= 2) {
       let valToAdd = 0;
       if (Math.abs(x) >= 1) {
         if (x > 0) setCurrDir(Direction.RIGHT);
@@ -156,7 +168,15 @@ function PuzzleLine({ puzzle }) {
       }
     }
 
-    console.log(currDistRef.current);
+    // Corner turn assist (moving in a about perpendicular direction to edge)
+    if (largerDir % 2 !== currDirRef.current % 2 && largerDist > 1) {
+      // TODO: MAGIC NUMBER
+      const assistSpeed = 5;
+      const extraMovement =
+        currDistRef.current > EDGESEGMAX / 2 ? assistSpeed : -assistSpeed;
+      setCurrDist(currDistRef.current + extraMovement);
+    }
+
     if (currDistRef.current >= EDGESEGMAX) {
       let newPoint = {
         ...currPoint,
