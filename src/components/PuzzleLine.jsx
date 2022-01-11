@@ -97,13 +97,13 @@ function PuzzleLine({ puzzle }) {
 
     const moveCap = 4;
     let x = e.movementX;
-    if(Math.abs(x) > moveCap) {
-      if(x > 0) x = moveCap;
+    if (Math.abs(x) > moveCap) {
+      if (x > 0) x = moveCap;
       else x = -moveCap;
     }
     let y = e.movementY;
-    if(Math.abs(y) > moveCap) {
-      if(y > 0) y = moveCap;
+    if (Math.abs(y) > moveCap) {
+      if (y > 0) y = moveCap;
       else y = -moveCap;
     }
 
@@ -156,6 +156,7 @@ function PuzzleLine({ puzzle }) {
         valToAdd = Math.abs(y);
       }
 
+      // TODO: replace out of bounds with checking if valid edge
       if (!outOfBounds(currPoint, currDirRef.current)) {
         // TODO: jumps between directions
         setCurrDist(currDistRef.current + valToAdd);
@@ -192,6 +193,14 @@ function PuzzleLine({ puzzle }) {
           break;
       }
 
+      // Corner turn assist (moving in a about perpendicular direction to edge)
+      if (largerDir % 2 !== currDirRef.current % 2 && largerDist > 1) {
+        // TODO: MAGIC NUMBER
+        const assistSpeed = 1;
+        distDiff +=
+          currDistRef.current > EDGESEGMAX / 2 ? assistSpeed : -assistSpeed;
+      }
+
       // check if distance should be added
       if (
         currDistRef.current + LINEWIDTH * 2 < EDGESEGMAX ||
@@ -207,15 +216,6 @@ function PuzzleLine({ puzzle }) {
         setCurrDist(0);
         setLinePoints((points) => [...points, nextPoint]);
       }
-    }
-
-    // Corner turn assist (moving in a about perpendicular direction to edge)
-    if (largerDir % 2 !== currDirRef.current % 2 && largerDist > 1) {
-      // TODO: MAGIC NUMBER
-      const assistSpeed = 5;
-      const extraMovement =
-        currDistRef.current > EDGESEGMAX / 2 ? assistSpeed : -assistSpeed;
-      setCurrDist(currDistRef.current + extraMovement);
     }
 
     // check if last point needs removing
