@@ -3,7 +3,7 @@ import { styled } from "@mui/material/styles";
 
 import Puzzle, { Direction } from "../classes/Puzzle";
 
-import { PIECESZ } from "./PuzzlePiece/info";
+import { PIECESZ, STARTRAD } from "./PuzzlePiece/info";
 
 function PuzzleLine({ puzzle, points, currDir, currDist }) {
   if (!puzzle) {
@@ -41,6 +41,7 @@ function PuzzleLine({ puzzle, points, currDir, currDist }) {
 
   return (
     <g transform="translate(50, 50)">
+      {/* <circle cx="50" cy="50" r={`${STARTRAD}`} color="red" /> */}
       {points.map((e, i) => {
         return i === points.length - 1 ? (
           <React.Fragment key={`${i}`}></React.Fragment>
@@ -51,7 +52,7 @@ function PuzzleLine({ puzzle, points, currDir, currDist }) {
             y1={`${(e.y * PIECESZ) / 2}`}
             x2={`${(points[i + 1].x * PIECESZ) / 2}`}
             y2={`${(points[i + 1].y * PIECESZ) / 2}`}
-            stroke="cyan"
+            stroke="red"
             strokeWidth="20"
             strokeLinecap="round"
           ></line>
@@ -64,7 +65,7 @@ function PuzzleLine({ puzzle, points, currDir, currDist }) {
           y1={`${(points[points.length - 1].y * PIECESZ) / 2}`}
           x2={`${(lastPoint.x * PIECESZ) / 2}`}
           y2={`${(lastPoint.y * PIECESZ) / 2}`}
-          stroke="cyan"
+          stroke="red"
           strokeWidth="20"
           strokeLinecap="round"
         ></line>
