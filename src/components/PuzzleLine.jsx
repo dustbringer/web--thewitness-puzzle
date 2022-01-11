@@ -5,7 +5,7 @@ import PuzzleLineRaw from "./PuzzleLineRaw";
 
 import PuzzleClass, { Direction } from "../classes/Puzzle";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
-import { PIECESZ, STARTRAD } from "./PuzzlePiece/info";
+import { PIECESZ, STARTRAD, LINEWIDTH } from "./PuzzlePiece/info";
 
 import useStateRef from "../hooks/useStateRef";
 
@@ -91,12 +91,21 @@ function PuzzleLine({ puzzle }) {
 
   const updatePosition = (e) => {
     // TODO: change ref values at end
-    // TODO: prevent line overlap
     // TODO: check valid edge is desired direction
     // TODO: fix up directional switch statement (probably pass in functions)
+    // TODO: account for starting position on edge
 
-    const x = e.movementX;
-    const y = e.movementY;
+    const moveCap = 4;
+    let x = e.movementX;
+    if(Math.abs(x) > moveCap) {
+      if(x > 0) x = moveCap;
+      else x = -moveCap;
+    }
+    let y = e.movementY;
+    if(Math.abs(y) > moveCap) {
+      if(y > 0) y = moveCap;
+      else y = -moveCap;
+    }
 
     // The larger of the x and y inputs
     const largerDist = Math.abs(x) > Math.abs(y) ? Math.abs(x) : Math.abs(y);
@@ -125,9 +134,16 @@ function PuzzleLine({ puzzle }) {
       );
     };
 
-    // TODO: cap x && y
+    const containsPoint = (p, pointArr) => {
+      for (let i of pointArr) {
+        if (i.x === p.x && i.y === p.y) {
+          return true;
+        }
+      }
+      return false;
+    };
 
-    // vertex
+    // check if near vertex
     if (currDistRef.current <= 2) {
       let valToAdd = 0;
       if (Math.abs(x) >= 1) {
@@ -146,25 +162,50 @@ function PuzzleLine({ puzzle }) {
       } else {
         setCurrDist(0);
       }
-      // edge
     } else {
       // add or subtract y based on current direction's positive movement
+      const nextPoint = {
+        ...currPoint,
+      };
+      let distDiff = 0;
+
+      // assign variables based on current direction
       switch (currDirRef.current) {
         case Direction.UP:
-          setCurrDist(currDistRef.current - y);
+          nextPoint.y -= 2;
+          distDiff = -y;
           break;
         case Direction.RIGHT:
-          setCurrDist(currDistRef.current + x);
+          nextPoint.x += 2;
+          distDiff = +x;
           break;
         case Direction.DOWN:
-          setCurrDist(currDistRef.current + y);
+          nextPoint.y += 2;
+          distDiff = +y;
           break;
         case Direction.LEFT:
-          setCurrDist(currDistRef.current - x);
+          nextPoint.x -= 2;
+          distDiff = -x;
           break;
         default:
           console.log(`wtf dis direction: ${currDirRef.current}`);
           break;
+      }
+
+      // check if distance should be added
+      if (
+        currDistRef.current + LINEWIDTH * 2 < EDGESEGMAX ||
+        !containsPoint(nextPoint, linePointsRef.current) ||
+        currDistRef.current + distDiff < currDistRef.current
+      ) {
+        setCurrDist(currDistRef.current + distDiff);
+      }
+
+      // check if new point should be added
+      if (currDistRef.current >= EDGESEGMAX) {
+        // TODO: jumps to centre
+        setCurrDist(0);
+        setLinePoints((points) => [...points, nextPoint]);
       }
     }
 
@@ -177,34 +218,7 @@ function PuzzleLine({ puzzle }) {
       setCurrDist(currDistRef.current + extraMovement);
     }
 
-    if (currDistRef.current >= EDGESEGMAX) {
-      let newPoint = {
-        ...currPoint,
-      };
-      switch (currDirRef.current) {
-        case Direction.UP:
-          newPoint.y -= 2;
-          break;
-        case Direction.RIGHT:
-          newPoint.x += 2;
-          break;
-        case Direction.DOWN:
-          newPoint.y += 2;
-          break;
-        case Direction.LEFT:
-          newPoint.x -= 2;
-          break;
-        default:
-          console.log("you've come to the wrong place punk!!!");
-          break;
-      }
-
-      // TODO: jumps to centre
-      setCurrDist(0);
-      setLinePoints((points) => [...points, newPoint]);
-      console.log(newPoint);
-    }
-
+    // check if last point needs removing
     if (lastPoint !== null) {
       if (
         (currDirRef.current === Direction.UP &&
@@ -236,6 +250,7 @@ function PuzzleLine({ puzzle }) {
     else div.requestPointerLock();
 
     setLinePoints([puzzle.start[i]]);
+    console.log(linePointsRef.current);
     setCurrDist(0);
     setCurrDir(Direction.UP);
   };
