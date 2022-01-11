@@ -4,7 +4,7 @@ import { styled } from "@mui/material/styles";
 import PuzzleGrid from "./PuzzleGrid";
 import PuzzleLine from "./PuzzleLine";
 
-import PuzzleClass from "../classes/Puzzle";
+import PuzzleClass, { Direction } from "../classes/Puzzle";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
 import { PIECESZ, STARTRAD } from "./PuzzlePiece/info";
 
@@ -16,12 +16,7 @@ const Root = styled("div")`
 
 // TODO: update this
 const EDGESEGMAX = 100;
-const Direction = Object.freeze({
-  UP: 0,
-  RIGHT: 1,
-  DOWN: 2,
-  LEFT: 3,
-});
+
 
 const StartButton = styled("div")`
   width: ${(props) => props.relativestartrad * 2}px;
@@ -107,7 +102,7 @@ function Puzzle({ puzzle }) {
   const relativeStartRad = STARTRAD * pixelsPerUnit; // In pixels
 
   const updatePosition = (e) => {
-    const speed = 0.8;
+    const speed = 0.4;
     const x = e.movementX * speed;
     const y = e.movementY * speed;
 
@@ -194,6 +189,8 @@ function Puzzle({ puzzle }) {
     console.log(startRefs.current);
     // setActiveStart(() => puzzle.start[i]);
     setLinePoints([puzzle.start[i]]);
+    setCurrDist(0);
+    setCurrDir(Direction.UP);
   };
 
   const myPoints = [
@@ -234,7 +231,7 @@ function Puzzle({ puzzle }) {
         <PuzzleLine
           puzzle={puzzle}
           points={linePoints}
-          // current={{ dir: currDir, dist: currDist }}
+          current={{ dir: currDir, dist: currDist }}
         />
       </svg>
       <button onClick={() => console.log(linePoints)}>asdasds</button>

@@ -1,6 +1,13 @@
 import { isVertex, isSpace, isEdge } from "../util/puzzle_grid_util";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
 
+export const Direction = Object.freeze({
+  UP: 0,
+  RIGHT: 1,
+  DOWN: 2,
+  LEFT: 3,
+});
+
 class Puzzle {
   constructor(width, height) {
     if (height <= 0 || width <= 0)
