@@ -5,28 +5,30 @@ import Puzzle, { Direction } from "../classes/Puzzle";
 
 import { PIECESZ } from "./PuzzlePiece/info";
 
-function PuzzleLine({ puzzle, points, current }) {
+function PuzzleLine({ puzzle, points, currDir, currDist }) {
   if (!puzzle) {
     console.error(`Error: Puzzle is ${puzzle}`);
     return <p>Puzzle Failed to load</p>;
   }
 
-  const getCurrent = (point, vec) => {
+  const getCurrent = (point, dir, dist) => {
     let x = point.x;
     let y = point.y;
 
-    switch (vec.dir) {
+    switch (dir) {
       case Direction.UP:
-        y -= vec.dist / 100;
+        y -= dist / 100;
         break;
       case Direction.RIGHT:
-        x += vec.dist / 100;
+        x += dist / 100;
         break;
       case Direction.DOWN:
-        y += vec.dist / 100;
+        y += dist / 100;
         break;
       case Direction.LEFT:
-        x -= vec.dist / 100;
+        x -= dist / 100;
+        break;
+      default:
         break;
     }
 
@@ -34,7 +36,8 @@ function PuzzleLine({ puzzle, points, current }) {
   };
 
   let lastPoint;
-  if (points.length !== 0) lastPoint = getCurrent(points[points.length - 1], current);
+  if (points.length !== 0)
+    lastPoint = getCurrent(points[points.length - 1], currDir, currDist);
 
   return (
     <g transform="translate(50, 50)">

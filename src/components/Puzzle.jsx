@@ -17,7 +17,6 @@ const Root = styled("div")`
 // TODO: update this
 const EDGESEGMAX = 100;
 
-
 const StartButton = styled("div")`
   width: ${(props) => props.relativestartrad * 2}px;
   height: ${(props) => props.relativestartrad * 2}px;
@@ -30,6 +29,7 @@ const StartButton = styled("div")`
 function Puzzle({ puzzle }) {
   // Index of start that has been clicked
   const [activeStart, setActiveStart, activeStartRef] = useStateRef(null);
+  const varLock = React.useRef(false);
   const [linePoints, setLinePoints, linePointsRef] = useStateRef([]);
   const [currDir, setCurrDir, currDirRef] = useStateRef(Direction.UP);
   const [currDist, setCurrDist, currDistRef] = useStateRef(0);
@@ -53,18 +53,15 @@ function Puzzle({ puzzle }) {
       document.exitPointerLock || document.mozExitPointerLock;
 
     const lockChangeAlert = () => {
-      console.log("AAAAAAAAAAAAAAAA", document.pointerLockElement);
       if (
         (document.pointerLockElement !== null &&
           startRefs.current.has(document.pointerLockElement)) ||
         (document.mozPointerLockElement !== null &&
           startRefs.current.has(document.mozPointerLockElement))
       ) {
-        console.log("The pointer lock status is now locked");
         document.addEventListener("mousemove", updatePosition, false);
         pointerLocked.current = true;
       } else {
-        console.log("The pointer lock status is now unlocked");
         document.removeEventListener("mousemove", updatePosition, false);
         pointerLocked.current = false;
       }
@@ -83,10 +80,6 @@ function Puzzle({ puzzle }) {
     document.addEventListener("mozpointerlockerror", lockError, false);
   }, []);
 
-  React.useEffect(() => {
-    console.log(linePoints);
-  }, [linePoints]);
-
   if (!puzzle) {
     console.error(`Error: Puzzle is ${puzzle}`);
     return <p>Puzzle Failed to load</p>;
@@ -102,7 +95,12 @@ function Puzzle({ puzzle }) {
   const relativeStartRad = STARTRAD * pixelsPerUnit; // In pixels
 
   const updatePosition = (e) => {
-    const speed = 0.4;
+    // Get the lock
+    if (!varLock.current) varLock.current = true;
+    else return;
+    console.log("GOT THE LOCK!");
+
+    const speed = 1;
     const x = e.movementX * speed;
     const y = e.movementY * speed;
 
@@ -116,7 +114,7 @@ function Puzzle({ puzzle }) {
       mouseDist = currDistRef.current; // copy of stored curr distance
 
     // if currently vertex, update current direction
-    if (Math.abs(mouseDist) >= 0.4) {
+    if (Math.abs(mouseDist) <= 10) {
       if (Math.abs(x) > Math.abs(y)) {
         mouseDir = x > 0 ? Direction.RIGHT : Direction.LEFT;
       } else {
@@ -131,7 +129,15 @@ function Puzzle({ puzzle }) {
     }
 
     while (mouseMag > 0) {
+      // console.log("MouseMag:", mouseMag);
+      // console.log("MouseDist:", mouseDist);
       if (mouseMag + mouseDist >= EDGESEGMAX) {
+        // console.log(
+        //   "IF :",
+        //   mouseMag + mouseDist,
+        //   EDGESEGMAX,
+        //   mouseMag + mouseDist >= EDGESEGMAX
+        // );
         // Take off enough from mouseMag to max out mouseDist
         mouseMag -= EDGESEGMAX - mouseDist;
         mouseDist = 0;
@@ -139,36 +145,27 @@ function Puzzle({ puzzle }) {
         // Add new point to array
         const lastPoint =
           linePointsRef.current[linePointsRef.current.length - 1];
+        const points = [...linePointsRef.current]; // copy of stored points
         if (lastPoint) {
           switch (mouseDir) {
             case Direction.UP:
-              setLinePoints((curr) => [
-                ...curr,
-                { x: lastPoint.x, y: lastPoint.y - 2 },
-              ]);
+              points.push({ x: lastPoint.x, y: lastPoint.y - 2 });
               break;
             case Direction.RIGHT:
-              setLinePoints((curr) => [
-                ...curr,
-                { x: lastPoint.x + 2, y: lastPoint.y },
-              ]);
+              points.push({ x: lastPoint.x + 2, y: lastPoint.y });
               break;
             case Direction.DOWN:
-              setLinePoints((curr) => [
-                ...curr,
-                { x: lastPoint.x, y: lastPoint.y + 2 },
-              ]);
+              points.push({ x: lastPoint.x, y: lastPoint.y + 2 });
               break;
             case Direction.LEFT:
-              setLinePoints((curr) => [
-                ...curr,
-                { x: lastPoint.x - 2, y: lastPoint.y },
-              ]);
+              points.push({ x: lastPoint.x - 2, y: lastPoint.y });
               break;
             default:
               break;
           }
         }
+        setLinePoints(points);
+        console.log("ADDED");
       } else {
         mouseDist += mouseMag;
         mouseMag = 0;
@@ -178,6 +175,10 @@ function Puzzle({ puzzle }) {
     setCurrDir(mouseDir);
     setCurrDist(mouseDist);
     // console.log(e.movementX, e.movementY);
+
+    // Release the lock
+    varLock.current = false;
+    console.log("RELEASED THE LOCK!");
   };
 
   const handleStartClick = (e, i) => {
@@ -186,7 +187,7 @@ function Puzzle({ puzzle }) {
     // Stop if already locked to avoid double unlock
     if (pointerLocked.current) document.exitPointerLock();
     else div.requestPointerLock();
-    console.log(startRefs.current);
+
     // setActiveStart(() => puzzle.start[i]);
     setLinePoints([puzzle.start[i]]);
     setCurrDist(0);
@@ -231,7 +232,8 @@ function Puzzle({ puzzle }) {
         <PuzzleLine
           puzzle={puzzle}
           points={linePoints}
-          current={{ dir: currDir, dist: currDist }}
+          currDir={currDir}
+          currDist={currDist}
         />
       </svg>
       <button onClick={() => console.log(linePoints)}>asdasds</button>
