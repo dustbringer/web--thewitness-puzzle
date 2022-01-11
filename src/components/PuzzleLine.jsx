@@ -156,6 +156,7 @@ function PuzzleLine({ puzzle }) {
       }
     }
 
+    console.log(currDistRef.current);
     if (currDistRef.current >= EDGESEGMAX) {
       let newPoint = {
         ...currPoint,
