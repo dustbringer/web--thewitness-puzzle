@@ -121,7 +121,7 @@ function Puzzle({ puzzle }) {
       mouseDist = currDistRef.current; // copy of stored curr distance
 
     // if currently vertex, update current direction
-    if (mouseDist === 0) {
+    if (Math.abs(mouseDist) >= 0.4) {
       if (Math.abs(x) > Math.abs(y)) {
         mouseDir = x > 0 ? Direction.RIGHT : Direction.LEFT;
       } else {
@@ -136,7 +136,7 @@ function Puzzle({ puzzle }) {
     }
 
     while (mouseMag > 0) {
-      if (mouseMag + mouseDist > EDGESEGMAX) {
+      if (mouseMag + mouseDist >= EDGESEGMAX) {
         // Take off enough from mouseMag to max out mouseDist
         mouseMag -= EDGESEGMAX - mouseDist;
         mouseDist = 0;
