@@ -4,7 +4,7 @@ import { styled } from "@mui/material/styles";
 import PuzzleGrid from "./PuzzleGrid";
 import PuzzleLine from "./PuzzleLine";
 
-import PuzzleClass from "../classes/Puzzle";
+import PuzzleClass, { Direction } from "../classes/Puzzle";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
 import { PIECESZ, STARTRAD } from "./PuzzlePiece/info";
 
@@ -16,12 +16,7 @@ const Root = styled("div")`
 
 // TODO: update this
 const EDGESEGMAX = 100;
-const Direction = Object.freeze({
-  UP: 0,
-  RIGHT: 1,
-  DOWN: 2,
-  LEFT: 3,
-});
+
 
 const StartButton = styled("div")`
   width: ${(props) => props.relativestartrad * 2}px;
@@ -107,7 +102,7 @@ function Puzzle({ puzzle }) {
   const relativeStartRad = STARTRAD * pixelsPerUnit; // In pixels
 
   const updatePosition = (e) => {
-    const speed = 0.8;
+    const speed = 0.4;
     const x = e.movementX * speed;
     const y = e.movementY * speed;
 
@@ -121,7 +116,7 @@ function Puzzle({ puzzle }) {
       mouseDist = currDistRef.current; // copy of stored curr distance
 
     // if currently vertex, update current direction
-    if (mouseDist === 0) {
+    if (Math.abs(mouseDist) <= 0.4) {
       if (Math.abs(x) > Math.abs(y)) {
         mouseDir = x > 0 ? Direction.RIGHT : Direction.LEFT;
       } else {
@@ -136,7 +131,7 @@ function Puzzle({ puzzle }) {
     }
 
     while (mouseMag > 0) {
-      if (mouseMag + mouseDist > EDGESEGMAX) {
+      if (mouseMag + mouseDist >= EDGESEGMAX) {
         // Take off enough from mouseMag to max out mouseDist
         mouseMag -= EDGESEGMAX - mouseDist;
         mouseDist = 0;
@@ -194,6 +189,8 @@ function Puzzle({ puzzle }) {
     console.log(startRefs.current);
     // setActiveStart(() => puzzle.start[i]);
     setLinePoints([puzzle.start[i]]);
+    setCurrDist(0);
+    setCurrDir(Direction.UP);
   };
 
   const myPoints = [
@@ -234,7 +231,7 @@ function Puzzle({ puzzle }) {
         <PuzzleLine
           puzzle={puzzle}
           points={linePoints}
-          // current={{ dir: currDir, dist: currDist }}
+          current={{ dir: currDir, dist: currDist }}
         />
       </svg>
       <button onClick={() => console.log(linePoints)}>asdasds</button>
