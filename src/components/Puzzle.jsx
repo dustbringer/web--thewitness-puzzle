@@ -15,8 +15,7 @@ const Root = styled("div")`
 `;
 
 // TODO: update this
-const EDGESEGMAX = 100;
-
+const EDGESEGMAX = 200;
 
 const StartButton = styled("div")`
   width: ${(props) => props.relativestartrad * 2}px;
@@ -29,7 +28,6 @@ const StartButton = styled("div")`
 
 function Puzzle({ puzzle }) {
   // Index of start that has been clicked
-  const [activeStart, setActiveStart, activeStartRef] = useStateRef(null);
   const [linePoints, setLinePoints, linePointsRef] = useStateRef([]);
   const [currDir, setCurrDir, currDirRef] = useStateRef(Direction.UP);
   const [currDist, setCurrDist, currDistRef] = useStateRef(0);
@@ -102,82 +100,80 @@ function Puzzle({ puzzle }) {
   const relativeStartRad = STARTRAD * pixelsPerUnit; // In pixels
 
   const updatePosition = (e) => {
-    const speed = 0.4;
-    const x = e.movementX * speed;
-    const y = e.movementY * speed;
+    // TODO: change ref values at end
+    // TODO: removing old line point
+    // TODO: prevent line overlap
+    // TODO: prevent leaving grid
+    // TODO: add leeway to add new segment
 
-    // TODO: scale & fine tune speed
-    // TODO: edge case
-    // TODO: moving backwards
-    // TODO: current distance = 100
+    const x = e.movementX;
+    const y = e.movementY;
+    // console.log(x, y);
 
-    let mouseMag, // magnitude of this mouse input (in one of x or y direction)
-      mouseDir = currDirRef.current, // copy of stored curr direction
-      mouseDist = currDistRef.current; // copy of stored curr distance
+    // TODO: cap x && y
 
-    // if currently vertex, update current direction
-    if (Math.abs(mouseDist) >= 0.4) {
-      if (Math.abs(x) > Math.abs(y)) {
-        mouseDir = x > 0 ? Direction.RIGHT : Direction.LEFT;
-      } else {
-        mouseDir = y > 0 ? Direction.DOWN : Direction.UP;
+    // vertex
+    if (currDistRef.current <= 8) {
+      if (Math.abs(x) >= 2) {
+        x > 0 ? setCurrDir(Direction.RIGHT) : setCurrDir(Direction.LEFT);
+        // TODO: jumps between directions
+        setCurrDist(currDistRef.current + Math.abs(x));
+      } else if (Math.abs(y) >= 2) {
+        y > 0 ? setCurrDir(Direction.DOWN) : setCurrDir(Direction.UP);
+        setCurrDist(currDistRef.current + Math.abs(y));
       }
-    }
 
-    if (mouseDir % 2 === 0) {
-      mouseMag = Math.abs(y);
+      // edge
     } else {
-      mouseMag = Math.abs(x);
-    }
-
-    while (mouseMag > 0) {
-      if (mouseMag + mouseDist >= EDGESEGMAX) {
-        // Take off enough from mouseMag to max out mouseDist
-        mouseMag -= EDGESEGMAX - mouseDist;
-        mouseDist = 0;
-
-        // Add new point to array
-        const lastPoint =
-          linePointsRef.current[linePointsRef.current.length - 1];
-        if (lastPoint) {
-          switch (mouseDir) {
-            case Direction.UP:
-              setLinePoints((curr) => [
-                ...curr,
-                { x: lastPoint.x, y: lastPoint.y - 2 },
-              ]);
-              break;
-            case Direction.RIGHT:
-              setLinePoints((curr) => [
-                ...curr,
-                { x: lastPoint.x + 2, y: lastPoint.y },
-              ]);
-              break;
-            case Direction.DOWN:
-              setLinePoints((curr) => [
-                ...curr,
-                { x: lastPoint.x, y: lastPoint.y + 2 },
-              ]);
-              break;
-            case Direction.LEFT:
-              setLinePoints((curr) => [
-                ...curr,
-                { x: lastPoint.x - 2, y: lastPoint.y },
-              ]);
-              break;
-            default:
-              break;
-          }
-        }
-      } else {
-        mouseDist += mouseMag;
-        mouseMag = 0;
+      // add or subtract y based on current direction's positive movement
+      switch (currDirRef.current) {
+        case Direction.UP:
+          setCurrDist(currDistRef.current - y);
+          break;
+        case Direction.RIGHT:
+          setCurrDist(currDistRef.current + x);
+          break;
+        case Direction.DOWN:
+          setCurrDist(currDistRef.current + y);
+          break;
+        case Direction.LEFT:
+          setCurrDist(currDistRef.current - x);
+          break;
+        default:
+          console.log(`wtf dis direction: ${currDirRef.current}`);
+          break;
       }
     }
 
-    setCurrDir(mouseDir);
-    setCurrDist(mouseDist);
-    // console.log(e.movementX, e.movementY);
+    if (currDistRef.current >= EDGESEGMAX) {
+      let newPoint = {
+        x: linePointsRef.current[linePointsRef.current.length - 1].x,
+        y: linePointsRef.current[linePointsRef.current.length - 1].y,
+      };
+      switch (currDirRef.current) {
+        case Direction.UP:
+          newPoint.y -= 2;
+          break;
+        case Direction.RIGHT:
+          newPoint.x += 2;
+          break;
+        case Direction.DOWN:
+          newPoint.y += 2;
+          break;
+        case Direction.LEFT:
+          newPoint.x -= 2;
+          break;
+        default:
+          console.log("you've come to the wrong place punk!!!");
+          break;
+      }
+
+      // TODO: may jump slightly
+      setCurrDist(0);
+      setLinePoints((points) => [...points, newPoint]);
+    }
+
+    // console.log(currDistRef.current);
   };
 
   const handleStartClick = (e, i) => {
@@ -187,7 +183,6 @@ function Puzzle({ puzzle }) {
     if (pointerLocked.current) document.exitPointerLock();
     else div.requestPointerLock();
     console.log(startRefs.current);
-    // setActiveStart(() => puzzle.start[i]);
     setLinePoints([puzzle.start[i]]);
     setCurrDist(0);
     setCurrDir(Direction.UP);
@@ -231,7 +226,7 @@ function Puzzle({ puzzle }) {
         <PuzzleLine
           puzzle={puzzle}
           points={linePoints}
-          current={{ dir: currDir, dist: currDist }}
+          current={{ dist: currDist, dir: currDir }}
         />
       </svg>
       <button onClick={() => console.log(linePoints)}>asdasds</button>
