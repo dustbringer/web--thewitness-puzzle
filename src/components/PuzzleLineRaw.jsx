@@ -65,7 +65,7 @@ function PuzzleLine({ puzzle, points, currDir, currDist }) {
           y1={`${(points[points.length - 1].y * PIECESZ) / 2}`}
           x2={`${(lastPoint.x * PIECESZ) / 2}`}
           y2={`${(lastPoint.y * PIECESZ) / 2}`}
-          stroke="red"
+          stroke="orange"
           strokeWidth="20"
           strokeLinecap="round"
         ></line>

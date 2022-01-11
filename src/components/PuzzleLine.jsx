@@ -91,30 +91,49 @@ function PuzzleLine({ puzzle }) {
 
   const updatePosition = (e) => {
     // TODO: change ref values at end
-    // TODO: removing old line point
     // TODO: prevent line overlap
-    // TODO: prevent leaving grid
-    // TODO: add leeway to add new segment
+    // TODO: check valid edge is desired direction
+    // TODO: fix up directional switch statement (probably pass in functions)
 
     const x = e.movementX;
     const y = e.movementY;
-    // console.log(x, y);
+    let currPoint = null;
+    if (linePointsRef.current.length > 0)
+      currPoint = linePointsRef.current[linePointsRef.current.length - 1];
+    let lastPoint = null;
+    if (linePointsRef.current.length > 1)
+      lastPoint = linePointsRef.current[linePointsRef.current.length - 2];
+
+    const outOfBounds = (curr, dir) => {
+      return (
+        (curr.x === 0 && dir === Direction.LEFT) ||
+        (curr.x >= puzzle.gridw - 1 && dir === Direction.RIGHT) ||
+        (curr.y === 0 && dir === Direction.UP) ||
+        (curr.y >= puzzle.gridh - 1 && dir === Direction.DOWN)
+      );
+    };
 
     // TODO: cap x && y
 
     // vertex
     if (currDistRef.current <= 8) {
-      if (Math.abs(x) >= 2) {
+      let valToAdd = 0;
+      if (Math.abs(x) >= 1) {
         if (x > 0) setCurrDir(Direction.RIGHT);
         else setCurrDir(Direction.LEFT);
-        // TODO: jumps between directions
-        setCurrDist(currDistRef.current + Math.abs(x));
-      } else if (Math.abs(y) >= 2) {
+        valToAdd = Math.abs(x);
+      } else {
         if (y > 0) setCurrDir(Direction.DOWN);
         else setCurrDir(Direction.UP);
-        setCurrDist(currDistRef.current + Math.abs(y));
+        valToAdd = Math.abs(y);
       }
 
+      if (!outOfBounds(currPoint, currDirRef.current)) {
+        // TODO: jumps between directions
+        setCurrDist(currDistRef.current + valToAdd);
+      } else {
+        setCurrDist(0);
+      }
       // edge
     } else {
       // add or subtract y based on current direction's positive movement
@@ -139,8 +158,7 @@ function PuzzleLine({ puzzle }) {
 
     if (currDistRef.current >= EDGESEGMAX) {
       let newPoint = {
-        x: linePointsRef.current[linePointsRef.current.length - 1].x,
-        y: linePointsRef.current[linePointsRef.current.length - 1].y,
+        ...currPoint,
       };
       switch (currDirRef.current) {
         case Direction.UP:
@@ -160,12 +178,34 @@ function PuzzleLine({ puzzle }) {
           break;
       }
 
-      // TODO: may jump slightly
+      // TODO: jumps to centre
       setCurrDist(0);
       setLinePoints((points) => [...points, newPoint]);
+      console.log(newPoint);
     }
 
-    // console.log(currDistRef.current);
+    if (lastPoint !== null) {
+      if (
+        (currDirRef.current === Direction.UP &&
+          lastPoint.y === currPoint.y - 2) ||
+        (currDirRef.current === Direction.RIGHT &&
+          lastPoint.x === currPoint.x + 2) ||
+        (currDirRef.current === Direction.DOWN &&
+          lastPoint.y === currPoint.y + 2) ||
+        (currDirRef.current === Direction.LEFT &&
+          lastPoint.x === currPoint.x - 2)
+      ) {
+        setLinePoints((points) => {
+          return points.slice(0, points.length - 1);
+        });
+        setCurrDist(EDGESEGMAX - currDistRef.current);
+        if (currDirRef.current === Direction.RIGHT) {
+          setCurrDir(Direction.LEFT);
+        } else {
+          setCurrDir(Math.abs(currDirRef.current - 2));
+        }
+      }
+    }
   };
 
   const handleStartClick = (e, i) => {
