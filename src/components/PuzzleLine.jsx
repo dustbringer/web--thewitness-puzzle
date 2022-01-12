@@ -5,7 +5,8 @@ import useStateRef from "../hooks/useStateRef";
 import PuzzleLineRaw from "./PuzzleLineRaw";
 import PuzzleLineStart from "./PuzzleLineStart";
 
-import PuzzleClass, { Direction } from "../classes/Puzzle";
+import PuzzleClass from "../classes/Puzzle";
+import Direction from "../enums/Direction";
 import { getViewboxSize } from "../util/puzzleDisplayUtil";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
 import { PIECESZ, STARTRAD, LINEWIDTH } from "./PuzzlePiece/info";
@@ -14,6 +15,11 @@ import { PIECESZ, STARTRAD, LINEWIDTH } from "./PuzzlePiece/info";
 const EDGESEGMAX = 200;
 const moveCap = 60;
 const assistSpeed = 5;
+
+const getDirInfo = (x, y) => {
+  const maxDist = Math.max(Math.abs(x), Math.abs(y));
+  const minDist = Math.min(Math.abs(x), Math.abs(y));
+};
 
 function PuzzleLine({ puzzle, width }) {
   const [linePoints, setLinePoints, linePointsRef] = useStateRef([]);
@@ -120,9 +126,9 @@ function PuzzleLine({ puzzle, width }) {
           nextPoint.x -= 2;
           distDiff = -x;
           break;
-          case NaN:
-            console.log('tdasf');
-            break;
+        case NaN:
+          console.log("tdasf");
+          break;
         default:
           console.log(`wtf dis direction: ${updatedDir}`);
           break;

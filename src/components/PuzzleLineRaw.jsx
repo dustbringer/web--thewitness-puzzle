@@ -3,7 +3,8 @@ import { styled } from "@mui/material/styles";
 
 import FixedSVG from "./FixedSVG";
 
-import Puzzle, { Direction } from "../classes/Puzzle";
+import Puzzle from "../classes/Puzzle";
+import Direction from "../enums/Direction";
 import { getViewboxSize } from "../util/puzzleDisplayUtil";
 import { PIECESZ, STARTRAD } from "./PuzzlePiece/info";
 

@@ -1,14 +1,6 @@
 import { isVertex, isSpace, isEdge } from "../util/puzzleGridUtil";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
 
-export const Direction = Object.freeze({
-  UP: 0,
-  RIGHT: 1,
-  DOWN: 2,
-  LEFT: 3,
-  NONE: -1,
-});
-
 class Puzzle {
   constructor(width, height) {
     if (height <= 0 || width <= 0)
@@ -94,7 +86,7 @@ class Puzzle {
       (this.grid[x][y] &&
         this.grid[x][y].hasOwnProperty("isStart") &&
         this.grid[x][y].isStart) ||
-      (this.grid[x][y] && this.grid[x][y].sym === EdgSym.break) // Block END on BREAK
+      (this.grid[x][y] && this.grid[x][y].sym === EdgSym.BREAK) // Block END on BREAK
     ) {
       throw new Error("Puzzle Error: Failed to set end");
     }
@@ -135,7 +127,7 @@ class Puzzle {
       !this.isEdgeInGrid(x, y) ||
       sym === undefined ||
       !(sym in Object.values(EdgSym)) ||
-      (sym === EdgSym.break && this.grid[x][y] && this.grid[x][y].isEnd) // Block BREAK on END
+      (sym === EdgSym.BREAK && this.grid[x][y] && this.grid[x][y].isEnd) // Block BREAK on END
     ) {
       throw new Error("Puzzle Error: Failed to add symbol to edge");
     }

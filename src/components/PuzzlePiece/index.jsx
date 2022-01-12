@@ -36,7 +36,7 @@ function Vertex({ puzzle, x, y }) {
 /* ONLY RUN THIS ON EDGES */
 function Edge({ puzzle, x, y }) {
   let NewEdge;
-  if (puzzle.checkSymbol(x, y, EdgSym.break)) {
+  if (puzzle.checkSymbol(x, y, EdgSym.BREAK)) {
     NewEdge = Break;
   } else {
     NewEdge = EdgeRound;
