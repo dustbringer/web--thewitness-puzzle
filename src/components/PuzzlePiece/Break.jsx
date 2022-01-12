@@ -1,24 +1,31 @@
 import * as React from "react";
+import { BREAKWIDTH, LINEWIDTH } from "./info";
 
-// TODO: break outside edge rounded
+/*
+ * Another way to have the edges rounded:
+ * Have dashed line (with rounded caps) and
+ * rectangles to cover the inner roundedness
+ */
 function Break(props) {
   return (
     <g {...props}>
+      <circle cx="0" cy="50" r="10" />
       <line
         x1="0"
         y1="50"
-        x2="33.33"
+        x2={`${50 - BREAKWIDTH / 2}`}
         y2="50"
         stroke="black"
-        strokeWidth="20"
+        strokeWidth={LINEWIDTH}
       ></line>
+      <circle cx="100" cy="50" r="10" />
       <line
-        x1="66.67"
+        x1={`${50 + BREAKWIDTH / 2}`}
         y1="50"
         x2="100"
         y2="50"
         stroke="black"
-        strokeWidth="20"
+        strokeWidth={LINEWIDTH}
       ></line>
     </g>
   );
