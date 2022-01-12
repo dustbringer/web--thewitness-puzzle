@@ -47,4 +47,8 @@ export const getDirInfo = (x, y) => {
 };
 
 export const reverseDir = (dir) => (dir < 0 ? Direction.NONE : (dir + 2) % 4);
-export const sameAxis = (d1, d2) => d1 % 2 === d2 % 2;
+export const sameAxis = (d1, d2) => d1 >= 0 && d2 >= 0 && d1 % 2 === d2 % 2;
+export const isVertical = (dir) => dir >= 0 && dir % 2;
+export const isHorizontal = (dir) => dir >= 0 && !(dir % 2);
+export const dirToSign = (dir) =>
+  dir < 0 ? 0 : Math.sign(((dir + 1) % 4) - (dir % 2 ? 1 : 2));
