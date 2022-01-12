@@ -38,7 +38,7 @@ function PuzzleLine({ puzzle, width }) {
   };
 
   const capVal = (val, cap) => {
-    return Math.abs(val) > cap ? cap * (val / Math.abs(val)) : val;
+    return Math.abs(val) > cap ? cap * Math.sign(val) : val;
   };
 
   const containsPoint = (p, pArr) => {
@@ -92,7 +92,6 @@ function PuzzleLine({ puzzle, width }) {
       if (outOfBounds(currPoint, updatedDir)) {
         updatedDist = 0;
       }
-
     } else {
       // add or subtract y based on current direction's positive movement
       const nextPoint = {
