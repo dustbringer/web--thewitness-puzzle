@@ -29,14 +29,26 @@ function PuzzleLine({ puzzle, width }) {
   const [linePoints, setLinePoints, linePointsRef] = useStateRef([]);
   const [currDir, setCurrDir, currDirRef] = useStateRef(Direction.UP);
   const [currDist, setCurrDist, currDistRef] = useStateRef(0);
-
-  // TODO: VICTOR LOOK HERE PLEASE, I DON'T KNOW WHERE THESE SHOULD GO
-  // this spot is ok
   const outOfBounds = (curr, dir) =>
     (curr.x === 0 && dir === Direction.LEFT) ||
     (curr.x >= puzzle.gridw - 1 && dir === Direction.RIGHT) ||
     (curr.y === 0 && dir === Direction.UP) ||
     (curr.y >= puzzle.gridh - 1 && dir === Direction.DOWN);
+
+  const pointInDir = (dir, p) => {
+    return dir % 2
+      ? { x: p.x + (dir - 2) * -2, y: p.y }
+      : { x: p.x, y: p.y + (dir - 1) * 2 };
+  };
+
+  const backtrackingPoint = (dir, currPoint, lastPoint) => {
+    const comparisonPoint = pointInDir(dir, currPoint);
+    return (
+      lastPoint !== null &&
+      comparisonPoint.x === lastPoint.x &&
+      comparisonPoint.y === lastPoint.y
+    );
+  };
 
   // TODO: FIXME: there is a better way of doing this using Array.prototype.some()
   const containsPoint = (p, pArr) => {
@@ -52,7 +64,7 @@ function PuzzleLine({ puzzle, width }) {
     // TODO: check valid edge is desired direction
     // TODO: fix up directional switch statement (probably pass in functions)
     // TODO: account for starting position on edge
-    // TODO: clicking escape keeps last line segment
+    // TODO: clicking escape should remove all line segments
     // TODO: end of puzzle
     // TODO: replace out of bounds with checking if valid edge
 
@@ -73,6 +85,7 @@ function PuzzleLine({ puzzle, width }) {
       lastPoint = linePointsRef.current[linePointsRef.current.length - 2];
 
     // check if near vertex
+    // TODO: does not account for moving into the vertex
     if (updatedDist <= 4) {
       updatedDir = maxDir;
       updatedDist += maxDist;
@@ -103,7 +116,6 @@ function PuzzleLine({ puzzle, width }) {
           distDiff = -x;
           break;
         default:
-          console.log(`wtf dis direction: ${updatedDir}`);
           break;
       }
 
@@ -141,24 +153,12 @@ function PuzzleLine({ puzzle, width }) {
     }
 
     // check if last point needs removing
-    if (lastPoint !== null) {
-      // TODO: change if statement into function
-      if (
-        (updatedDir === Direction.UP && currPoint.y - 2 === lastPoint.y) ||
-        (updatedDir === Direction.RIGHT && currPoint.x + 2 === lastPoint.x) ||
-        (updatedDir === Direction.DOWN && currPoint.y + 2 === lastPoint.y) ||
-        (updatedDir === Direction.LEFT && currPoint.x - 2 === lastPoint.x)
-      ) {
-        setLinePoints((points) => {
-          return points.slice(0, points.length - 1);
-        });
-        updatedDist = EDGESEGMAX - updatedDist;
-        if (updatedDir === Direction.RIGHT) {
-          updatedDir = Direction.LEFT;
-        } else {
-          updatedDir = Math.abs(updatedDir - 2);
-        }
-      }
+    if (backtrackingPoint(updatedDir, currPoint, lastPoint)) {
+      setLinePoints((points) => {
+        return points.slice(0, points.length - 1);
+      });
+      updatedDist = EDGESEGMAX - updatedDist;
+      updatedDir = reverseDir(updatedDir);
     }
 
     setCurrDist(updatedDist);
