@@ -15,20 +15,35 @@ export const getDirY = (y) => {
 export const getDirInfo = (x, y) => {
   const xAbs = Math.abs(x);
   const yAbs = Math.abs(y);
-  const maxDist = Math.max(xAbs, yAbs);
-  const minDist = Math.min(xAbs, yAbs);
+  const maxDistAbs = Math.max(xAbs, yAbs);
+  const minDistAbs = Math.min(xAbs, yAbs);
 
   const xDir = getDirX(x);
   const yDir = getDirY(y);
-  let maxDir, minDir;
+  let maxDir, minDir, minDist, maxDist;
   if (xAbs >= yAbs) {
     maxDir = getDirX(x);
     minDir = getDirY(y);
+    minDist = x;
+    maxDist = y;
   } else {
     maxDir = getDirY(y);
     minDir = getDirX(x);
+    minDist = y;
+    maxDist = x;
   }
-  return { xDir, yDir, xAbs, yAbs, maxDist, minDist, maxDir, minDir };
+  return {
+    xDir,
+    yDir,
+    xAbs,
+    yAbs,
+    maxDistAbs,
+    minDistAbs,
+    maxDist,
+    minDist,
+    maxDir,
+    minDir,
+  };
 };
 
 export const reverseDir = (dir) => (dir < 0 ? Direction.NONE : (dir + 2) % 4);
