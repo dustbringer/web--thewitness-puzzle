@@ -20,8 +20,8 @@ const assistSpeed = 5;
 const getDirInfo = (x, y) => {
   const absX = Math.abs(x);
   const absY = Math.abs(y);
-  const maxDist = Math.max(Math.abs(x), Math.abs(y));
-  const minDist = Math.min(Math.abs(x), Math.abs(y));
+  const maxDist = Math.max(absX, absY);
+  const minDist = Math.min(absX, absY);
 };
 
 function PuzzleLine({ puzzle, width }) {
