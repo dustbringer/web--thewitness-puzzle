@@ -29,6 +29,16 @@ function PuzzleLine({ puzzle, width }) {
   const [currDir, setCurrDir, currDirRef] = useStateRef(Direction.UP);
   const [currDist, setCurrDist, currDistRef] = useStateRef(0);
 
+  // TODO: VICTOR LOOK HERE PLEASE
+  const outOfBounds = (curr, dir) => {
+    return (
+      (curr.x === 0 && dir === Direction.LEFT) ||
+      (curr.x >= puzzle.gridw - 1 && dir === Direction.RIGHT) ||
+      (curr.y === 0 && dir === Direction.UP) ||
+      (curr.y >= puzzle.gridh - 1 && dir === Direction.DOWN)
+    );
+  };
+
   const handleMouseMove = (e) => {
     // TODO: check valid edge is desired direction
     // TODO: fix up directional switch statement (probably pass in functions)
@@ -38,16 +48,14 @@ function PuzzleLine({ puzzle, width }) {
     let updatedDist = currDistRef.current;
     let updatedDir = currDirRef.current;
 
-    let x = e.movementX;
-    if (Math.abs(x) > moveCap) {
-      if (x > 0) x = moveCap;
-      else x = -moveCap;
-    }
-    let y = e.movementY;
-    if (Math.abs(y) > moveCap) {
-      if (y > 0) y = moveCap;
-      else y = -moveCap;
-    }
+    const x =
+      Math.abs(e.movementX) > moveCap
+        ? moveCap * (x / Math.abs(x))
+        : e.movementX;
+    const y =
+      Math.abs(e.movementY) > moveCap
+        ? moveCap * (y / Math.abs(y))
+        : e.movementY;
 
     // The larger of the x and y inputs
     const largerDist = Math.abs(x) > Math.abs(y) ? Math.abs(x) : Math.abs(y);
@@ -66,15 +74,6 @@ function PuzzleLine({ puzzle, width }) {
     let lastPoint = null;
     if (linePointsRef.current.length > 1)
       lastPoint = linePointsRef.current[linePointsRef.current.length - 2];
-
-    const outOfBounds = (curr, dir) => {
-      return (
-        (curr.x === 0 && dir === Direction.LEFT) ||
-        (curr.x >= puzzle.gridw - 1 && dir === Direction.RIGHT) ||
-        (curr.y === 0 && dir === Direction.UP) ||
-        (curr.y >= puzzle.gridh - 1 && dir === Direction.DOWN)
-      );
-    };
 
     const containsPoint = (p, pointArr) => {
       for (let i of pointArr) {
@@ -160,7 +159,11 @@ function PuzzleLine({ puzzle, width }) {
       if (updatedDist >= EDGESEGMAX) {
         // TODO: check if direction is valid
         setLinePoints((points) => [...points, nextPoint]);
-        updatedDist -= EDGESEGMAX;
+        if (!outOfBounds(nextPoint, updatedDir)) {
+          updatedDist -= EDGESEGMAX;
+        } else {
+          updatedDist = 0;
+        }
       }
     }
 
@@ -191,7 +194,6 @@ function PuzzleLine({ puzzle, width }) {
 
   const handleStart = (i) => {
     setLinePoints([puzzle.start[i]]);
-    console.log(linePointsRef.current);
     setCurrDist(0);
     setCurrDir(Direction.UP);
   };
@@ -218,7 +220,7 @@ function PuzzleLine({ puzzle, width }) {
         }}
         onClick={() => console.log(linePoints)}
       >
-        asdasds
+        Hi, I'm a button :)
       </button>
     </>
   );
