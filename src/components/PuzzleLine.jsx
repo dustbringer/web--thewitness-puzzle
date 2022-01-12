@@ -7,7 +7,12 @@ import PuzzleLineStart from "./PuzzleLineStart";
 
 import PuzzleClass from "../classes/Puzzle";
 import Direction from "../enums/Direction";
-import { getDirX, getDirY, reverseDir } from "../util/directionUtil";
+import {
+  getDirX,
+  getDirY,
+  getDirInfo,
+  reverseDir,
+} from "../util/directionUtil";
 import { getViewboxSize } from "../util/puzzleDisplayUtil";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
 import { PIECESZ, STARTRAD, LINEWIDTH } from "./PuzzlePiece/info";
@@ -16,13 +21,6 @@ import { PIECESZ, STARTRAD, LINEWIDTH } from "./PuzzlePiece/info";
 const EDGESEGMAX = 200;
 const moveCap = 60;
 const assistSpeed = 5;
-
-const getDirInfo = (x, y) => {
-  const absX = Math.abs(x);
-  const absY = Math.abs(y);
-  const maxDist = Math.max(absX, absY);
-  const minDist = Math.min(absX, absY);
-};
 
 function PuzzleLine({ puzzle, width }) {
   const [linePoints, setLinePoints, linePointsRef] = useStateRef([]);
@@ -48,6 +46,9 @@ function PuzzleLine({ puzzle, width }) {
       if (y > 0) y = moveCap;
       else y = -moveCap;
     }
+
+    const { xDir, yDir, xAbs, yAbs, maxDist, minDist, maxDir, minDir } =
+      getDirInfo(x, y);
 
     // The larger of the x and y inputs
     const largerDist = Math.abs(x) > Math.abs(y) ? Math.abs(x) : Math.abs(y);
