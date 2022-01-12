@@ -87,12 +87,16 @@ function PuzzleLine({ puzzle, width }) {
       minDir,
     } = getDirInfo(x, y);
 
-    let currPoint = null;
-    if (linePointsRef.current.length > 0)
-      currPoint = linePointsRef.current[linePointsRef.current.length - 1];
-    let lastPoint = null;
-    if (linePointsRef.current.length > 1)
-      lastPoint = linePointsRef.current[linePointsRef.current.length - 2];
+    const currPoint =
+      linePointsRef.current.length > 0
+        ? linePointsRef.current[linePointsRef.current.length - 1]
+        : null;
+    const lastPoint =
+      linePointsRef.current.length > 1
+        ? linePointsRef.current[linePointsRef.current.length - 2]
+        : null;
+    const nextPoint =
+      currPoint !== null ? pointInDir(updatedDir, currPoint) : null;
 
     // check if near vertex
     // TODO: does not account for moving into the vertex
@@ -103,27 +107,8 @@ function PuzzleLine({ puzzle, width }) {
         updatedDist = 0;
       }
     } else {
-      // add or subtract y based on current direction's positive movement
-      const nextPoint = pointInDir(updatedDir, currPoint);
-      let distDiff = 0;
-
-      // assign variables based on current direction
-      switch (updatedDir) {
-        case Direction.UP:
-          distDiff = -y;
-          break;
-        case Direction.RIGHT:
-          distDiff = +x;
-          break;
-        case Direction.DOWN:
-          distDiff = +y;
-          break;
-        case Direction.LEFT:
-          distDiff = -x;
-          break;
-        default:
-          break;
-      }
+      let distDiff =
+        updatedDir % 2 ? x * -(updatedDir - 2) : y * (updatedDir - 1);
 
       // Corner turn assist (moving in a about perpendicular direction to edge)
       if (!sameAxis(maxDir, updatedDir) && maxDistAbs > 1) {
@@ -145,16 +130,14 @@ function PuzzleLine({ puzzle, width }) {
           updatedDist += distDiff;
         }
       }
-
-      // check if new point should be added
-      if (updatedDist >= EDGESEGMAX) {
-        // TODO: check if direction is valid
-        setLinePoints((points) => [...points, nextPoint]);
-        if (!outOfBounds(nextPoint, updatedDir)) {
-          updatedDist -= EDGESEGMAX;
-        } else {
-          updatedDist = 0;
-        }
+    }
+    
+    // check if new point should be added
+    if (updatedDist >= EDGESEGMAX && nextPoint != null) {
+      setLinePoints((points) => [...points, nextPoint]);
+      updatedDist -= EDGESEGMAX;
+      if (outOfBounds(nextPoint, updatedDir)) {
+        updatedDist = 0;
       }
     }
 
