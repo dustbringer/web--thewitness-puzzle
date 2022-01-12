@@ -24,13 +24,13 @@ export const getDirInfo = (x, y) => {
   if (xAbs >= yAbs) {
     maxDir = getDirX(x);
     minDir = getDirY(y);
-    minDist = x;
-    maxDist = y;
+    maxDist = x;
+    minDist = y;
   } else {
     maxDir = getDirY(y);
     minDir = getDirX(x);
-    minDist = y;
-    maxDist = x;
+    maxDist = y;
+    minDist = x;
   }
   return {
     xDir,

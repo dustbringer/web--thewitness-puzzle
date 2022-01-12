@@ -74,8 +74,18 @@ function PuzzleLine({ puzzle, width }) {
     const x = capVal(e.movementX, moveCap);
     const y = capVal(e.movementY, moveCap);
 
-    const { xDir, yDir, xAbs, yAbs, maxDist, minDist, maxDir, minDir } =
-      getDirInfo(x, y);
+    const {
+      xDir,
+      yDir,
+      xAbs,
+      yAbs,
+      maxDistAbs,
+      minDistAbs,
+      maxDist,
+      minDist,
+      maxDir,
+      minDir,
+    } = getDirInfo(x, y);
 
     let currPoint = null;
     if (linePointsRef.current.length > 0)
@@ -88,7 +98,7 @@ function PuzzleLine({ puzzle, width }) {
     // TODO: does not account for moving into the vertex
     if (updatedDist <= 4) {
       updatedDir = maxDir;
-      updatedDist += maxDist;
+      updatedDist += maxDistAbs;
       if (outOfBounds(currPoint, updatedDir)) {
         updatedDist = 0;
       }
@@ -116,7 +126,7 @@ function PuzzleLine({ puzzle, width }) {
       }
 
       // Corner turn assist (moving in a about perpendicular direction to edge)
-      if (!sameAxis(maxDir, updatedDir) && maxDist > 1) {
+      if (!sameAxis(maxDir, updatedDir) && maxDistAbs > 1) {
         distDiff += updatedDist > EDGESEGMAX / 2 ? assistSpeed : -assistSpeed;
       }
 
