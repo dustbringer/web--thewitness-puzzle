@@ -17,7 +17,7 @@ const FixedSVG = styled("svg")`
   position: absolute;
 `;
 
-// TODO: update this
+// TODO: move this to file
 const EDGESEGMAX = 200;
 const moveCap = 60;
 const assistSpeed = 5;
@@ -92,11 +92,12 @@ function PuzzleLine({ puzzle }) {
   const relativeStartRad = STARTRAD * pixelsPerUnit; // In pixels
 
   const updatePosition = (e) => {
-
-    // TODO: change ref values at end
     // TODO: check valid edge is desired direction
     // TODO: fix up directional switch statement (probably pass in functions)
     // TODO: account for starting position on edge
+
+    let updatedDist = currDistRef.current;
+    let updatedDir = currDirRef.current;
 
     let x = e.movementX;
     if (Math.abs(x) > moveCap) {
@@ -108,7 +109,7 @@ function PuzzleLine({ puzzle }) {
       if (y > 0) y = moveCap;
       else y = -moveCap;
     }
-    console.log(`X: ${e.movementX} - ${x} --- Y: ${e.movementY} - ${y}`);
+    // console.log(`X: ${e.movementX} - ${x} --- Y: ${e.movementY} - ${y}`);
 
     // The larger of the x and y inputs
     const largerDist = Math.abs(x) > Math.abs(y) ? Math.abs(x) : Math.abs(y);
@@ -147,22 +148,24 @@ function PuzzleLine({ puzzle }) {
     };
 
     // check if near vertex
-    if (currDistRef.current <= 2) {
+    if (updatedDist <= 2) {
       let valToAdd = 0;
       if (Math.abs(x) >= 1) {
-        if (x > 0) setCurrDir(Direction.RIGHT);
-        else setCurrDir(Direction.LEFT);
+        if (x > 0) updatedDir = Direction.RIGHT;
+        else updatedDir = Direction.LEFT;
         valToAdd = Math.abs(x);
       } else {
-        if (y > 0) setCurrDir(Direction.DOWN);
-        else setCurrDir(Direction.UP);
+        if (y > 0) updatedDir = Direction.DOWN;
+        else updatedDir = Direction.UP;
         valToAdd = Math.abs(y);
       }
 
       // TODO: replace out of bounds with checking if valid edge
-      if (!outOfBounds(currPoint, currDirRef.current)) {
-        // TODO: jumps between directions
-        setCurrDist(currDistRef.current + valToAdd);
+      if (!outOfBounds(currPoint, updatedDir)) {
+        updatedDist += valToAdd;
+      } else {
+        console.log("goodbye");
+        updatedDist = 0;
       }
     } else {
       // add or subtract y based on current direction's positive movement
@@ -172,7 +175,7 @@ function PuzzleLine({ puzzle }) {
       let distDiff = 0;
 
       // assign variables based on current direction
-      switch (currDirRef.current) {
+      switch (updatedDir) {
         case Direction.UP:
           nextPoint.y -= 2;
           distDiff = -y;
@@ -190,56 +193,65 @@ function PuzzleLine({ puzzle }) {
           distDiff = -x;
           break;
         default:
-          console.log(`wtf dis direction: ${currDirRef.current}`);
+          console.log(`wtf dis direction: ${updatedDir}`);
           break;
       }
 
       // Corner turn assist (moving in a about perpendicular direction to edge)
-      if (largerDir % 2 !== currDirRef.current % 2 && largerDist > 1) {
-        distDiff +=
-          currDistRef.current > EDGESEGMAX / 2 ? assistSpeed : -assistSpeed;
+      if (largerDir % 2 !== updatedDir % 2 && largerDist > 1) {
+        distDiff += updatedDist > EDGESEGMAX / 2 ? assistSpeed : -assistSpeed;
       }
 
       // check if distance should be added
       if (
-        currDistRef.current + LINEWIDTH * 2 < EDGESEGMAX ||
+        updatedDist + LINEWIDTH * 2 < EDGESEGMAX ||
         !containsPoint(nextPoint, linePointsRef.current) ||
-        currDistRef.current + distDiff < currDistRef.current
+        updatedDist + distDiff < updatedDist
       ) {
-        setCurrDist(currDistRef.current + distDiff);
+        if (
+          containsPoint(nextPoint, linePointsRef.current) &&
+          updatedDist + distDiff > EDGESEGMAX - LINEWIDTH * 2
+        ) {
+          updatedDist = EDGESEGMAX - LINEWIDTH * 2;
+        } else {
+          updatedDist += distDiff;
+        }
       }
 
       // check if new point should be added
-      if (currDistRef.current >= EDGESEGMAX) {
+      if (updatedDist >= EDGESEGMAX) {
         // TODO: check if direction is valid
         setLinePoints((points) => [...points, nextPoint]);
-        setCurrDist(currDistRef.current - EDGESEGMAX);
+        if (!outOfBounds(nextPoint, updatedDir)) {
+          updatedDist -= EDGESEGMAX;
+        } else {
+          updatedDist = 0;
+        }
       }
     }
 
     // check if last point needs removing
     if (lastPoint !== null) {
       if (
-        (currDirRef.current === Direction.UP &&
-          lastPoint.y === currPoint.y - 2) ||
-        (currDirRef.current === Direction.RIGHT &&
-          lastPoint.x === currPoint.x + 2) ||
-        (currDirRef.current === Direction.DOWN &&
-          lastPoint.y === currPoint.y + 2) ||
-        (currDirRef.current === Direction.LEFT &&
-          lastPoint.x === currPoint.x - 2)
+        (updatedDir === Direction.UP && lastPoint.y === currPoint.y - 2) ||
+        (updatedDir === Direction.RIGHT && lastPoint.x === currPoint.x + 2) ||
+        (updatedDir === Direction.DOWN && lastPoint.y === currPoint.y + 2) ||
+        (updatedDir === Direction.LEFT && lastPoint.x === currPoint.x - 2)
       ) {
         setLinePoints((points) => {
           return points.slice(0, points.length - 1);
         });
-        setCurrDist(EDGESEGMAX - currDistRef.current);
-        if (currDirRef.current === Direction.RIGHT) {
-          setCurrDir(Direction.LEFT);
+        updatedDist = EDGESEGMAX - updatedDist;
+        if (updatedDir === Direction.RIGHT) {
+          updatedDir = Direction.LEFT;
         } else {
-          setCurrDir(Math.abs(currDirRef.current - 2));
+          updatedDir = Math.abs(updatedDir - 2);
         }
       }
     }
+
+    setCurrDist(updatedDist);
+    setCurrDir(updatedDir);
   };
 
   const handleStartClick = (e, i) => {
