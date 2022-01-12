@@ -7,6 +7,7 @@ import PuzzleLineStart from "./PuzzleLineStart";
 
 import PuzzleClass from "../classes/Puzzle";
 import Direction from "../enums/Direction";
+import { getDirX, getDirY, reverseDir } from "../util/directionUtil";
 import { getViewboxSize } from "../util/puzzleDisplayUtil";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
 import { PIECESZ, STARTRAD, LINEWIDTH } from "./PuzzlePiece/info";
@@ -17,6 +18,8 @@ const moveCap = 60;
 const assistSpeed = 5;
 
 const getDirInfo = (x, y) => {
+  const absX = Math.abs(x);
+  const absY = Math.abs(y);
   const maxDist = Math.max(Math.abs(x), Math.abs(y));
   const minDist = Math.min(Math.abs(x), Math.abs(y));
 };
