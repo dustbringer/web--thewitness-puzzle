@@ -12,6 +12,7 @@ import {
   getDirY,
   getDirInfo,
   reverseDir,
+  sameAxis,
 } from "../util/directionUtil";
 import { getViewboxSize } from "../util/puzzleDisplayUtil";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
@@ -80,9 +81,7 @@ function PuzzleLine({ puzzle, width }) {
       }
     } else {
       // add or subtract y based on current direction's positive movement
-      const nextPoint = {
-        ...currPoint,
-      };
+      const nextPoint = { ...currPoint };
       let distDiff = 0;
 
       // assign variables based on current direction
@@ -109,7 +108,7 @@ function PuzzleLine({ puzzle, width }) {
       }
 
       // Corner turn assist (moving in a about perpendicular direction to edge)
-      if (maxDir % 2 !== updatedDir % 2 && maxDist > 1) {
+      if (!sameAxis(maxDir, updatedDir) && maxDist > 1) {
         distDiff += updatedDist > EDGESEGMAX / 2 ? assistSpeed : -assistSpeed;
       }
 

@@ -32,3 +32,4 @@ export const getDirInfo = (x, y) => {
 };
 
 export const reverseDir = (dir) => (dir < 0 ? Direction.NONE : (dir + 2) % 4);
+export const sameAxis = (d1, d2) => d1 % 2 === d2 % 2;
