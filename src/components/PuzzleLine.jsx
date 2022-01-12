@@ -22,25 +22,22 @@ const EDGESEGMAX = 200;
 const moveCap = 60;
 const assistSpeed = 5;
 
+const capVal = (val, cap) => (Math.abs(val) > cap ? cap * Math.sign(val) : val);
+
 function PuzzleLine({ puzzle, width }) {
   const [linePoints, setLinePoints, linePointsRef] = useStateRef([]);
   const [currDir, setCurrDir, currDirRef] = useStateRef(Direction.UP);
   const [currDist, setCurrDist, currDistRef] = useStateRef(0);
 
   // TODO: VICTOR LOOK HERE PLEASE, I DON'T KNOW WHERE THESE SHOULD GO
-  const outOfBounds = (curr, dir) => {
-    return (
-      (curr.x === 0 && dir === Direction.LEFT) ||
-      (curr.x >= puzzle.gridw - 1 && dir === Direction.RIGHT) ||
-      (curr.y === 0 && dir === Direction.UP) ||
-      (curr.y >= puzzle.gridh - 1 && dir === Direction.DOWN)
-    );
-  };
+  // this spot is ok
+  const outOfBounds = (curr, dir) =>
+    (curr.x === 0 && dir === Direction.LEFT) ||
+    (curr.x >= puzzle.gridw - 1 && dir === Direction.RIGHT) ||
+    (curr.y === 0 && dir === Direction.UP) ||
+    (curr.y >= puzzle.gridh - 1 && dir === Direction.DOWN);
 
-  const capVal = (val, cap) => {
-    return Math.abs(val) > cap ? cap * Math.sign(val) : val;
-  };
-
+  // TODO: FIXME: there is a better way of doing this using Array.prototype.some()
   const containsPoint = (p, pArr) => {
     for (let i of pArr) {
       if (i.x === p.x && i.y === p.y) {
@@ -66,17 +63,6 @@ function PuzzleLine({ puzzle, width }) {
 
     const { xDir, yDir, xAbs, yAbs, maxDist, minDist, maxDir, minDir } =
       getDirInfo(x, y);
-
-    // The larger of the x and y inputs
-    const largerDist = Math.abs(x) > Math.abs(y) ? Math.abs(x) : Math.abs(y);
-    const largerDir =
-      Math.abs(x) > Math.abs(y)
-        ? x > 0
-          ? Direction.RIGHT
-          : Direction.LEFT
-        : y > 0
-        ? Direction.DOWN
-        : Direction.UP;
 
     let currPoint = null;
     if (linePointsRef.current.length > 0)
@@ -123,7 +109,7 @@ function PuzzleLine({ puzzle, width }) {
       }
 
       // Corner turn assist (moving in a about perpendicular direction to edge)
-      if (largerDir % 2 !== updatedDir % 2 && largerDist > 1) {
+      if (maxDir % 2 !== updatedDir % 2 && maxDist > 1) {
         distDiff += updatedDist > EDGESEGMAX / 2 ? assistSpeed : -assistSpeed;
       }
 
