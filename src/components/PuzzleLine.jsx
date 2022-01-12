@@ -14,6 +14,7 @@ import {
   reverseDir,
   sameAxis,
   dirToSign,
+  isHorizontal,
 } from "../util/directionUtil";
 import { getViewboxSize } from "../util/puzzleDisplayUtil";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
@@ -30,6 +31,7 @@ function PuzzleLine({ puzzle, width }) {
   const [linePoints, setLinePoints, linePointsRef] = useStateRef([]);
   const [currDir, setCurrDir, currDirRef] = useStateRef(Direction.UP);
   const [currDist, setCurrDist, currDistRef] = useStateRef(0);
+
   const outOfBounds = (curr, dir) =>
     (curr.x === 0 && dir === Direction.LEFT) ||
     (curr.x >= puzzle.gridw - 1 && dir === Direction.RIGHT) ||
@@ -37,9 +39,9 @@ function PuzzleLine({ puzzle, width }) {
     (curr.y >= puzzle.gridh - 1 && dir === Direction.DOWN);
 
   const pointInDir = (dir, p) => {
-    return dir % 2
-      ? { x: p.x + (dir - 2) * -2, y: p.y }
-      : { x: p.x, y: p.y + (dir - 1) * 2 };
+    return isHorizontal(dir)
+      ? { x: p.x + dirToSign(dir) * 2, y: p.y }
+      : { x: p.x, y: p.y + dirToSign(dir) * 2 };
   };
 
   const backtrackingPoint = (dir, currPoint, lastPoint) => {
@@ -112,7 +114,7 @@ function PuzzleLine({ puzzle, width }) {
         updatedDist = 0;
       }
     } else {
-      let distDiff = (updatedDir % 2 ? x : y) * dirToSign(updatedDir);
+      let distDiff = (isHorizontal(updatedDir) ? x : y) * dirToSign(updatedDir);
 
       // Corner turn assist (moving in a about perpendicular direction to edge)
       if (!sameAxis(maxDir, updatedDir) && maxDistAbs > 1) {
