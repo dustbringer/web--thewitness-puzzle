@@ -6,13 +6,20 @@ import { getPixelSize } from "../util/puzzleDisplayUtil";
 const StartButton = styled("div")`
   width: ${(props) => props.relativestartrad * 2}px;
   height: ${(props) => props.relativestartrad * 2}px;
+  border-radius: ${(props) => props.relativestartrad}px;
   position: absolute;
   top: ${(props) => props.top}px;
   left: ${(props) => props.left}px;
   cursor: pointer;
 `;
 
-function PuzzleLineStart({ puzzle, width, handleStart, handleMouseMove }) {
+function PuzzleLineStart({
+  puzzle,
+  width,
+  handleStart,
+  handleEnd,
+  handleMouseMove,
+}) {
   // Using refs, since state doesnt interact well with event listeners
   // https://stackoverflow.com/questions/53845595/wrong-react-hooks-behaviour-with-event-listener
   const pointerLocked = React.useRef(false);
@@ -65,16 +72,18 @@ function PuzzleLineStart({ puzzle, width, handleStart, handleMouseMove }) {
   const handleStartClick = (e, i) => {
     const div = e.target;
     // Stop if already locked to avoid double unlock
-    if (pointerLocked.current) document.exitPointerLock();
-    else div.requestPointerLock();
-
-    handleStart(i);
+    if (pointerLocked.current) {
+      document.exitPointerLock();
+      handleEnd(i);
+    } else {
+      div.requestPointerLock();
+      handleStart(i);
+    }
   };
 
   return (
     <>
       {puzzle.start.map((e, i) => (
-        // TODO: Make this round to match the circle
         <StartButton
           key={`${i}`}
           ref={(ref) => startRefs.current.add(ref)}

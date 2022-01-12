@@ -18,7 +18,7 @@ import {
 } from "../util/directionUtil";
 import { getViewboxSize } from "../util/puzzleDisplayUtil";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
-import { PIECESZ, STARTRAD, LINEWIDTH } from "./PuzzlePiece/info";
+import { PIECESZ, STARTRAD, LINEWIDTH, BREAKWIDTH } from "./PuzzlePiece/info";
 
 // TODO: update this
 const EDGESEGMAX = 200;
@@ -28,6 +28,7 @@ const assistSpeed = 5;
 const capVal = (val, cap) => (Math.abs(val) > cap ? cap * Math.sign(val) : val);
 
 function PuzzleLine({ puzzle, width }) {
+  const [showLine, setShowLine] = React.useState(false);
   const [linePoints, setLinePoints, linePointsRef] = useStateRef([]);
   const [currDir, setCurrDir, currDirRef] = useStateRef(Direction.UP);
   const [currDist, setCurrDist, currDistRef] = useStateRef(0);
@@ -38,18 +39,27 @@ function PuzzleLine({ puzzle, width }) {
     (curr.y === 0 && dir === Direction.UP) ||
     (curr.y >= puzzle.gridh - 1 && dir === Direction.DOWN);
 
-  const pointInDir = (dir, p) => {
-    return isHorizontal(dir)
-      ? { x: p.x + dirToSign(dir) * 2, y: p.y }
-      : { x: p.x, y: p.y + dirToSign(dir) * 2 };
+  const isLineCrossingPoint = (dist) => {
+    return dist + LINEWIDTH > EDGESEGMAX - LINEWIDTH;
   };
 
-  const backtrackingPoint = (dir, currPoint, lastPoint) => {
+  const isLineCrossingBreak = (updatedDist) => {
+    return updatedDist + LINEWIDTH > (EDGESEGMAX - BREAKWIDTH) / 2;
+  };
+
+  // updatedDist + distDiff > EDGESEGMAX - LINEWIDTH * 2
+
+  const pointInDir = (dir, p) =>
+    isHorizontal(dir)
+      ? { x: p.x + dirToSign(dir) * 2, y: p.y }
+      : { x: p.x, y: p.y + dirToSign(dir) * 2 };
+
+  const isBacktrackingPoint = (dir, currPoint, prevPoint) => {
     const comparisonPoint = pointInDir(dir, currPoint);
     return (
-      lastPoint !== null &&
-      comparisonPoint.x === lastPoint.x &&
-      comparisonPoint.y === lastPoint.y
+      prevPoint !== null &&
+      comparisonPoint.x === prevPoint.x &&
+      comparisonPoint.y === prevPoint.y
     );
   };
 
@@ -92,11 +102,12 @@ function PuzzleLine({ puzzle, width }) {
       minDir,
     } = getDirInfo(x, y);
 
+    // Current vertex that the line attaches to
     const currPoint =
       linePointsRef.current.length > 0
         ? linePointsRef.current[linePointsRef.current.length - 1]
         : null;
-    const lastPoint =
+    const prevPoint =
       linePointsRef.current.length > 1
         ? linePointsRef.current[linePointsRef.current.length - 2]
         : null;
@@ -132,15 +143,17 @@ function PuzzleLine({ puzzle, width }) {
       //   distDiff += maxDistAbs * Math.sign(minDist);
       // }
 
+      // TODO: this probably can be simplified
       // check if distance should be added
       if (
-        updatedDist + LINEWIDTH * 2 < EDGESEGMAX ||
-        !containsPoint(nextPoint, linePointsRef.current) ||
-        updatedDist + distDiff < updatedDist
+        // TODO: This first check can be factored out
+        !isLineCrossingPoint(updatedDist) || // not intersecting the next point
+        !containsPoint(nextPoint, linePointsRef.current) || // havent been to next point
+        distDiff < 0 // moving backwards
       ) {
         if (
-          containsPoint(nextPoint, linePointsRef.current) &&
-          updatedDist + distDiff > EDGESEGMAX - LINEWIDTH * 2
+          containsPoint(nextPoint, linePointsRef.current) && // been to next point
+          isLineCrossingPoint(updatedDist + distDiff) // move will cross over into next point
         ) {
           updatedDist = EDGESEGMAX - LINEWIDTH * 2;
         } else {
@@ -158,8 +171,14 @@ function PuzzleLine({ puzzle, width }) {
       }
     }
 
+    /*
+     * When we change direction at a vertex, isBacktrackingPoint checks if
+     * the new direction is going back into the previously drawn edge segment.
+     * If so, remove the point we backtracked from and update the values of
+     * the current line segment to feel like it is controlling the removed edge.
+     */
     // check if last point needs removing
-    if (backtrackingPoint(updatedDir, currPoint, lastPoint)) {
+    if (isBacktrackingPoint(updatedDir, currPoint, prevPoint)) {
       setLinePoints((points) => {
         return points.slice(0, points.length - 1);
       });
@@ -174,22 +193,39 @@ function PuzzleLine({ puzzle, width }) {
   const handleStart = (i) => {
     setLinePoints([puzzle.start[i]]);
     setCurrDist(0);
-    setCurrDir(Direction.UP);
+    setCurrDir(Direction.NONE);
+    setShowLine(true);
+  };
+
+  const handleEnd = () => {
+    // for when mouse clicks to exit
+    // TODO: right click to exit, left click to keep the line
+    console.log("Ended");
+
+    setShowLine(false);
+
+    // TODO: replace this with what we actually want
+    setLinePoints((curr) => [curr[0]]);
+    setCurrDist(0);
+    setCurrDir(Direction.NONE);
   };
 
   return (
     <>
-      <PuzzleLineRaw
-        puzzle={puzzle}
-        width={width}
-        points={linePoints}
-        currDir={currDir}
-        currDist={currDist}
-      />
+      {showLine && (
+        <PuzzleLineRaw
+          puzzle={puzzle}
+          width={width}
+          points={linePoints}
+          currDir={currDir}
+          currDist={currDist}
+        />
+      )}
       <PuzzleLineStart
         puzzle={puzzle}
         width={width}
         handleStart={handleStart}
+        handleEnd={handleEnd}
         handleMouseMove={handleMouseMove}
       />
       <button
