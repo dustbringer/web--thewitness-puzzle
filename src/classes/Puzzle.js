@@ -1,4 +1,4 @@
-import { isVertex, isSpace, isEdge } from "../util/puzzle_grid_util";
+import { isVertex, isSpace, isEdge } from "../util/puzzleGridUtil";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
 
 export const Direction = Object.freeze({

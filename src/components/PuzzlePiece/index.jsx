@@ -4,7 +4,7 @@ import {
   isEdge,
   isVertex,
   isVertical,
-} from "../../util/puzzle_grid_util";
+} from "../../util/puzzleGridUtil";
 
 import Break from "./Break";
 import EdgeSquare from "./EdgeSquare";
