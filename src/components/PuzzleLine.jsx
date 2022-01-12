@@ -103,6 +103,8 @@ function PuzzleLine({ puzzle, width }) {
 
     // check if near vertex
     // TODO: does not account for moving into the vertex
+    // TODO: changing direction at edge flicks out into edge
+      // caused by add maxDistAbs to updatedDist
     if (updatedDist <= 4) {
       updatedDir = maxDir;
       updatedDist += maxDistAbs;
