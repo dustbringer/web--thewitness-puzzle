@@ -13,6 +13,7 @@ import {
   getDirInfo,
   reverseDir,
   sameAxis,
+  dirToSign,
 } from "../util/directionUtil";
 import { getViewboxSize } from "../util/puzzleDisplayUtil";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
@@ -61,12 +62,14 @@ function PuzzleLine({ puzzle, width }) {
   };
 
   const handleMouseMove = (e) => {
-    // TODO: check valid edge is desired direction
-    // TODO: fix up directional switch statement (probably pass in functions)
-    // TODO: account for starting position on edge
+    // TODO: check if a valid edge exists in desired direction
+    // TODO: replace out of bounds with checking for valid edge
     // TODO: clicking escape should remove all line segments
+    // TODO: circle at start
+    // TODO: can't go into start circle
+    // TODO: update turning assist
     // TODO: end of puzzle
-    // TODO: replace out of bounds with checking if valid edge
+    // TODO: account for starting position on edge
 
     let updatedDist = currDistRef.current;
     let updatedDir = currDirRef.current;
@@ -107,8 +110,7 @@ function PuzzleLine({ puzzle, width }) {
         updatedDist = 0;
       }
     } else {
-      let distDiff =
-        updatedDir % 2 ? x * -(updatedDir - 2) : y * (updatedDir - 1);
+      let distDiff = (updatedDir % 2 ? x : y) * dirToSign(updatedDir);
 
       // Corner turn assist (moving in a about perpendicular direction to edge)
       if (!sameAxis(maxDir, updatedDir) && maxDistAbs > 1) {
@@ -131,7 +133,7 @@ function PuzzleLine({ puzzle, width }) {
         }
       }
     }
-    
+
     // check if new point should be added
     if (updatedDist >= EDGESEGMAX && nextPoint != null) {
       setLinePoints((points) => [...points, nextPoint]);
