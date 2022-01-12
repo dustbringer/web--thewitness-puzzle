@@ -24,6 +24,7 @@ function PuzzleLine({ puzzle, width }) {
     // TODO: check valid edge is desired direction
     // TODO: fix up directional switch statement (probably pass in functions)
     // TODO: account for starting position on edge
+    // TODO: clicking escape keeps last line segment
 
     let updatedDist = currDistRef.current;
     let updatedDir = currDirRef.current;
@@ -76,9 +77,9 @@ function PuzzleLine({ puzzle, width }) {
     };
 
     // check if near vertex
-    if (updatedDist <= 2) {
+    if (updatedDist <= 4) {
       let valToAdd = 0;
-      if (Math.abs(x) >= 1) {
+      if (Math.abs(x) > Math.abs(y)) {
         if (x > 0) updatedDir = Direction.RIGHT;
         else updatedDir = Direction.LEFT;
         valToAdd = Math.abs(x);
@@ -120,9 +121,6 @@ function PuzzleLine({ puzzle, width }) {
           nextPoint.x -= 2;
           distDiff = -x;
           break;
-          case NaN:
-            console.log('tdasf');
-            break;
         default:
           console.log(`wtf dis direction: ${updatedDir}`);
           break;
@@ -153,21 +151,18 @@ function PuzzleLine({ puzzle, width }) {
       if (updatedDist >= EDGESEGMAX) {
         // TODO: check if direction is valid
         setLinePoints((points) => [...points, nextPoint]);
-        if (!outOfBounds(nextPoint, updatedDir)) {
-          updatedDist -= EDGESEGMAX;
-        } else {
-          updatedDist = 0;
-        }
+        updatedDist -= EDGESEGMAX;
       }
     }
 
     // check if last point needs removing
     if (lastPoint !== null) {
+      // TODO: change if statement into function
       if (
-        (updatedDir === Direction.UP && lastPoint.y === currPoint.y - 2) ||
-        (updatedDir === Direction.RIGHT && lastPoint.x === currPoint.x + 2) ||
-        (updatedDir === Direction.DOWN && lastPoint.y === currPoint.y + 2) ||
-        (updatedDir === Direction.LEFT && lastPoint.x === currPoint.x - 2)
+        (updatedDir === Direction.UP && currPoint.y - 2 === lastPoint.y) ||
+        (updatedDir === Direction.RIGHT && currPoint.x + 2 === lastPoint.x) ||
+        (updatedDir === Direction.DOWN && currPoint.y + 2 === lastPoint.y) ||
+        (updatedDir === Direction.LEFT && currPoint.x - 2 === lastPoint.x)
       ) {
         setLinePoints((points) => {
           return points.slice(0, points.length - 1);
