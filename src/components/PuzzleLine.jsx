@@ -27,7 +27,7 @@ function PuzzleLine({ puzzle, width }) {
   const [currDir, setCurrDir, currDirRef] = useStateRef(Direction.UP);
   const [currDist, setCurrDist, currDistRef] = useStateRef(0);
 
-  // TODO: VICTOR LOOK HERE PLEASE
+  // TODO: VICTOR LOOK HERE PLEASE, I DON'T KNOW WHERE THESE SHOULD GO
   const outOfBounds = (curr, dir) => {
     return (
       (curr.x === 0 && dir === Direction.LEFT) ||
@@ -37,23 +37,32 @@ function PuzzleLine({ puzzle, width }) {
     );
   };
 
+  const capVal = (val, cap) => {
+    return Math.abs(val) > cap ? cap * (val / Math.abs(val)) : val;
+  };
+
+  const containsPoint = (p, pArr) => {
+    for (let i of pArr) {
+      if (i.x === p.x && i.y === p.y) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   const handleMouseMove = (e) => {
     // TODO: check valid edge is desired direction
     // TODO: fix up directional switch statement (probably pass in functions)
     // TODO: account for starting position on edge
     // TODO: clicking escape keeps last line segment
+    // TODO: end of puzzle
+    // TODO: replace out of bounds with checking if valid edge
 
     let updatedDist = currDistRef.current;
     let updatedDir = currDirRef.current;
 
-    const x =
-      Math.abs(e.movementX) > moveCap
-        ? moveCap * (x / Math.abs(x))
-        : e.movementX;
-    const y =
-      Math.abs(e.movementY) > moveCap
-        ? moveCap * (y / Math.abs(y))
-        : e.movementY;
+    const x = capVal(e.movementX, moveCap);
+    const y = capVal(e.movementY, moveCap);
 
     const { xDir, yDir, xAbs, yAbs, maxDist, minDist, maxDir, minDir } =
       getDirInfo(x, y);
@@ -76,35 +85,14 @@ function PuzzleLine({ puzzle, width }) {
     if (linePointsRef.current.length > 1)
       lastPoint = linePointsRef.current[linePointsRef.current.length - 2];
 
-    const containsPoint = (p, pointArr) => {
-      for (let i of pointArr) {
-        if (i.x === p.x && i.y === p.y) {
-          return true;
-        }
-      }
-      return false;
-    };
-
     // check if near vertex
     if (updatedDist <= 4) {
-      let valToAdd = 0;
-      if (Math.abs(x) > Math.abs(y)) {
-        if (x > 0) updatedDir = Direction.RIGHT;
-        else updatedDir = Direction.LEFT;
-        valToAdd = Math.abs(x);
-      } else {
-        if (y > 0) updatedDir = Direction.DOWN;
-        else updatedDir = Direction.UP;
-        valToAdd = Math.abs(y);
-      }
-
-      // TODO: replace out of bounds with checking if valid edge
-      if (!outOfBounds(currPoint, updatedDir)) {
-        updatedDist += valToAdd;
-      } else {
-        console.log("goodbye");
+      updatedDir = maxDir;
+      updatedDist += maxDist;
+      if (outOfBounds(currPoint, updatedDir)) {
         updatedDist = 0;
       }
+
     } else {
       // add or subtract y based on current direction's positive movement
       const nextPoint = {
