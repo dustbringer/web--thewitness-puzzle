@@ -94,25 +94,21 @@ function PuzzleLine({ puzzle, width }) {
       }
     } else {
       // add or subtract y based on current direction's positive movement
-      const nextPoint = { ...currPoint };
+      const nextPoint = pointInDir(updatedDir, currPoint);
       let distDiff = 0;
 
       // assign variables based on current direction
       switch (updatedDir) {
         case Direction.UP:
-          nextPoint.y -= 2;
           distDiff = -y;
           break;
         case Direction.RIGHT:
-          nextPoint.x += 2;
           distDiff = +x;
           break;
         case Direction.DOWN:
-          nextPoint.y += 2;
           distDiff = +y;
           break;
         case Direction.LEFT:
-          nextPoint.x -= 2;
           distDiff = -x;
           break;
         default:
