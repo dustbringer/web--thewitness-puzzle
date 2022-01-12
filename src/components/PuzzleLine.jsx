@@ -120,6 +120,9 @@ function PuzzleLine({ puzzle, width }) {
           nextPoint.x -= 2;
           distDiff = -x;
           break;
+          case NaN:
+            console.log('tdasf');
+            break;
         default:
           console.log(`wtf dis direction: ${updatedDir}`);
           break;

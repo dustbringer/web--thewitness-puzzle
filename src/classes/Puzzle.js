@@ -6,6 +6,7 @@ export const Direction = Object.freeze({
   RIGHT: 1,
   DOWN: 2,
   LEFT: 3,
+  NONE: -1,
 });
 
 class Puzzle {
