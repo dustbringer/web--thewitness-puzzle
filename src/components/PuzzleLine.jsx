@@ -104,7 +104,7 @@ function PuzzleLine({ puzzle, width }) {
     // check if near vertex
     // TODO: does not account for moving into the vertex
     // TODO: changing direction at edge flicks out into edge
-      // caused by add maxDistAbs to updatedDist
+    // caused by add maxDistAbs to updatedDist
     if (updatedDist <= 4) {
       updatedDir = maxDir;
       updatedDist += maxDistAbs;
@@ -118,6 +118,17 @@ function PuzzleLine({ puzzle, width }) {
       if (!sameAxis(maxDir, updatedDir) && maxDistAbs > 1) {
         distDiff += updatedDist > EDGESEGMAX / 2 ? assistSpeed : -assistSpeed;
       }
+
+      // New turn assist (doesnt work well, try again after 'updatedDist >= EDGESEGMAX - 4')
+      // If some movement in perp direction, add it to value in current direction
+      // if (
+      //   !sameAxis(maxDir, updatedDir) &&
+      //   maxDistAbs > 1 &&
+      //   updatedDist >= 4 &&
+      //   updatedDist <= EDGESEGMAX - 4
+      // ) {
+      //   distDiff += maxDistAbs * Math.sign(minDist);
+      // }
 
       // check if distance should be added
       if (
@@ -139,7 +150,7 @@ function PuzzleLine({ puzzle, width }) {
     // check if new point should be added
     if (updatedDist >= EDGESEGMAX && nextPoint != null) {
       setLinePoints((points) => [...points, nextPoint]);
-      updatedDist -= EDGESEGMAX;
+      updatedDist %= EDGESEGMAX;
       if (outOfBounds(nextPoint, updatedDir)) {
         updatedDist = 0;
       }
