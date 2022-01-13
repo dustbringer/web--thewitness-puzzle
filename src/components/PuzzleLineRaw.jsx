@@ -58,7 +58,7 @@ function PuzzleLineRaw({ puzzle, width, points, currDir, currDist }) {
         <circle
           cx={`${(firstPoint.x * PIECESZ) / 2}`}
           cy={`${(firstPoint.y * PIECESZ) / 2}`}
-          r={`${STARTRAD}`}
+          r={STARTRAD}
           fill="red"
         />
         {points.map((e, i) => {
@@ -72,7 +72,7 @@ function PuzzleLineRaw({ puzzle, width, points, currDir, currDist }) {
               x2={`${(points[i + 1].x * PIECESZ) / 2}`}
               y2={`${(points[i + 1].y * PIECESZ) / 2}`}
               stroke="red"
-              strokeWidth={`${LINEWIDTH}`}
+              strokeWidth={LINEWIDTH}
               strokeLinecap="round"
             ></line>
           );
@@ -85,7 +85,7 @@ function PuzzleLineRaw({ puzzle, width, points, currDir, currDist }) {
             x2={`${(lastPoint.x * PIECESZ) / 2}`}
             y2={`${(lastPoint.y * PIECESZ) / 2}`}
             stroke="red"
-            strokeWidth={`${LINEWIDTH}`}
+            strokeWidth={LINEWIDTH}
             strokeLinecap="round"
           ></line>
         )}
