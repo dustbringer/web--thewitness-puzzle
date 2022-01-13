@@ -1,5 +1,6 @@
 import { isVertex, isSpace, isEdge } from "../util/puzzleGridUtil";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
+import Orientation from "../enums/Orientation";
 
 class Puzzle {
   constructor(width, height) {
@@ -10,15 +11,12 @@ class Puzzle {
     this.height = height;
     this.gridw = 2 * width + 1;
     this.gridh = 2 * height + 1;
-    this.grid = [...Array(this.gridw)].map((e) => Array(this.gridh).fill(null));
+    this.grid = [...Array(this.gridw)].map(() =>
+      [...Array(this.gridh)].map(() => ({}))
+    );
 
     this.start = [];
     this.end = [];
-
-    // Set this whenever
-    this.type = {
-      dots: false,
-    };
   }
 
   // Getter
@@ -71,12 +69,20 @@ class Puzzle {
         this.grid[x][y].hasOwnProperty("isEnd") &&
         this.grid[x][y].isEnd)
     ) {
-      throw new Error("Puzzle Error: Failed to set start");
+      throw new Error("Puzzle Error: Failed to add start");
     }
     this.start.push({ x, y });
 
     if (this.grid[x][y]) this.grid[x][y].isStart = true;
     else this.grid[x][y] = { isStart: true };
+  }
+
+  removeStart(x, y) {
+    if (!this.isStart(x, y)) {
+      throw new Error("Puzzle Error: Failed to remove start");
+    }
+
+    this.grid[x][y].isStart = false;
   }
 
   addEnd(x, y) {
@@ -88,12 +94,36 @@ class Puzzle {
         this.grid[x][y].isStart) ||
       (this.grid[x][y] && this.grid[x][y].sym === EdgSym.BREAK) // Block END on BREAK
     ) {
-      throw new Error("Puzzle Error: Failed to set end");
+      throw new Error("Puzzle Error: Failed to add end");
     }
     this.end.push({ x, y });
 
-    if (this.grid[x][y]) this.grid[x][y].isEnd = true;
-    else this.grid[x][y] = { isEnd: true };
+    if (this.grid[x][y]) {
+      this.grid[x][y].isEnd = true;
+    } else {
+      this.grid[x][y] = { isEnd: true };
+    }
+    if (isVertex(x, y)) this.grid[x][y].endOrientation = Orientation.VERTICAL;
+  }
+
+  removeEnd(x, y) {
+    if (!this.isEnd(x, y)) {
+      throw new Error("Puzzle Error: Failed to remove end");
+    }
+
+    this.grid[x][y].isEnd = false;
+  }
+
+  setEndOrientation(x, y, o) {
+    if (
+      !this.isEnd(x, y) ||
+      !this.isVertexInGrid(x, y) ||
+      !(o in Object.values(Orientation))
+    ) {
+      throw new Error("Puzzle Error: Failed to set end orientation");
+    }
+
+    this.grid[x][y].endOrientation = o;
   }
 
   addVtxSym(x, y, sym) {
@@ -136,11 +166,24 @@ class Puzzle {
     else this.grid[x][y] = { sym };
   }
 
+  removeSym(x, y) {
+    if (!this.isInGrid(x, y)) {
+      throw new Error("Puzzle Error: Failed to remove symbol");
+    }
+
+    if (this.grid[x][y]) delete this.grid[x][y].sym;
+  }
+
   removeEdge(x, y) {
-    return 0;
+    if (!this.isEdgeInGrid(x, y)) {
+      throw new Error("Puzzle Error: Failed to remove edge");
+    }
+
+    this.grid[x][y] = null;
   }
 
   removeVertex(x, y) {
+    // Not sure if we should allow this
     return 0;
   }
 }
