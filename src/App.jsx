@@ -4,11 +4,11 @@ import "./App.css";
 import Container from "./components/Container";
 import Puzzle from "./components/Puzzle";
 
-import breakSVG from "./visuals/break.svg";
-
 import PuzzleClass from "./classes/Puzzle";
 import { VtxSym, SpcSym, EdgSym } from "./enums/Sym";
 import Orientation from "./enums/Orientation";
+
+import removedEdgeMaze1 from "./puzzles/removedEdgeMaze1";
 
 function App() {
   const p = new PuzzleClass(4, 4);
