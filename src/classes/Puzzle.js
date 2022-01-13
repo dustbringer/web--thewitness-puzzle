@@ -47,6 +47,7 @@ class Puzzle {
     );
   }
   isStart(x, y) {
+    // FIXME: Not start when there are no edges?
     return this.isInGrid(x, y) && this.grid[x][y] && this.grid[x][y].isStart;
   }
   isEnd(x, y) {
@@ -55,6 +56,15 @@ class Puzzle {
   checkSymbol(x, y, sym) {
     return (
       this.isInGrid(x, y) && this.grid[x][y] && this.grid[x][y].sym === sym
+    );
+  }
+  countEdges(x, y) {
+    if (!this.isVertexInGrid(x, y)) {
+      return 0;
+    }
+    const exists = (x, y) => (this.isInGrid(x, y) && this.grid[x][y] ? 1 : 0);
+    return (
+      exists(x + 1, y) + exists(x - 1, y) + exists(x, y + 1) + exists(x, y - 1)
     );
   }
 
@@ -78,8 +88,8 @@ class Puzzle {
     if (!this.isStart(x, y)) {
       throw new Error("Puzzle Error: Failed to remove start");
     }
-
     this.grid[x][y].isStart = false;
+    this.start = this.start.filter((e) => !(e.x === x && e.y === y));
   }
 
   addEnd(x, y) {
@@ -108,8 +118,8 @@ class Puzzle {
     if (!this.isEnd(x, y)) {
       throw new Error("Puzzle Error: Failed to remove end");
     }
-
     this.grid[x][y].isEnd = false;
+    this.end = this.end.filter((e) => !(e.x === x && e.y === y));
   }
 
   getEndOrientation(x, y) {
@@ -188,8 +198,9 @@ class Puzzle {
     if (!this.isEdgeInGrid(x, y)) {
       throw new Error("Puzzle Error: Failed to remove edge");
     }
-
     this.grid[x][y] = null;
+    this.end = this.end.filter((e) => !(e.x === x && e.y === y));
+    this.start = this.start.filter((e) => !(e.x === x && e.y === y));
   }
 
   removeVertex(x, y) {

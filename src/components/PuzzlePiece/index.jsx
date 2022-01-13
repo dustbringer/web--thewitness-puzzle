@@ -3,12 +3,12 @@ import {
   isSpace,
   isEdge,
   isVertex,
-  isVertical,
+  isEdgeVertical,
 } from "../../util/puzzleGridUtil";
 
 import Break from "./Break";
-import EdgeSquare from "./EdgeSquare";
-import EdgeRound from "./EdgeRound";
+import Edge from "./Edge";
+import VertexSquare from "./VertexSquare";
 import End from "./End";
 import EndDiagonal from "./EndDiagonal";
 import Start from "./Start";
@@ -42,35 +42,44 @@ const getEndRot = (puzzle, x, y) => {
 };
 
 /* ONLY RUN THIS ON VERTICES */
-function Vertex({ puzzle, x, y }) {
+function VertexComponent({ puzzle, x, y }) {
   if (puzzle.isEmpty(x, y)) return <></>;
-
   // TODO: if there is exactly one edge, show vertex square
+  if (
+    puzzle.countEdges(x, y) === 1 &&
+    !puzzle.isEnd(x, y) &&
+    !puzzle.isStart(x, y)
+  )
+    return (
+      <VertexSquare
+        transform={`translate(${(PIECESZ / 2) * x}, ${(PIECESZ / 2) * y})`}
+      />
+    );
   return <></>;
 }
 
 /* ONLY RUN THIS ON EDGES */
-function Edge({ puzzle, x, y }) {
+function EdgeComponent({ puzzle, x, y }) {
   if (puzzle.isEmpty(x, y)) return <></>;
 
   let NewEdge;
   if (puzzle.checkSymbol(x, y, EdgSym.BREAK)) {
     NewEdge = Break;
   } else {
-    NewEdge = EdgeRound;
+    NewEdge = Edge;
   }
 
   return (
     <NewEdge
       transform={`translate(${(PIECESZ / 2) * x}, ${
         (PIECESZ / 2) * y
-      }) rotate(${isVertical(x, y) ? 90 : 0}, 50, 50)`}
+      }) rotate(${isEdgeVertical(x, y) ? 90 : 0}, 50, 50)`}
     />
   );
 }
 
 /* ONLY RUN THIS ON SPACES */
-function Space({ puzzle, x, y }) {
+function SpaceComponent({ puzzle, x, y }) {
   if (puzzle.isEmpty(x, y)) return <></>;
 
   return <></>;
@@ -89,13 +98,13 @@ function PuzzlePiece({ puzzle, x, y }) {
   return (
     <>
       {/* Render Vertex */}
-      {isVertex(x, y) && <Vertex puzzle={puzzle} x={x} y={y} />}
+      {isVertex(x, y) && <VertexComponent puzzle={puzzle} x={x} y={y} />}
 
       {/* Render Space */}
-      {isSpace(x, y) && <Space puzzle={puzzle} x={x} y={y} />}
+      {isSpace(x, y) && <SpaceComponent puzzle={puzzle} x={x} y={y} />}
 
       {/* Render Edge */}
-      {isEdge(x, y) && <Edge puzzle={puzzle} x={x} y={y} />}
+      {isEdge(x, y) && <EdgeComponent puzzle={puzzle} x={x} y={y} />}
 
       {puzzle.isStart(x, y) && (
         <Start

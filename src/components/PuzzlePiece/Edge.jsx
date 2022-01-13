@@ -1,7 +1,7 @@
 import * as React from "react";
 import { LINEWIDTH } from "./info";
 
-function EdgeSquare(props) {
+function Edge(props) {
   return (
     <g {...props}>
       <line
@@ -11,9 +11,10 @@ function EdgeSquare(props) {
         y2="50"
         stroke="black"
         strokeWidth={LINEWIDTH}
+        strokeLinecap="round"
       ></line>
     </g>
   );
 }
 
-export default EdgeSquare;
+export default Edge;
