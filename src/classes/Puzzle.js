@@ -19,23 +19,12 @@ class Puzzle {
     this.end = [];
   }
 
-  // Getter
-  getGrid() {
-    return this.grid;
-  }
-  getWidth() {
-    return this.width;
-  }
-  getHeight() {
-    return this.height;
-  }
-  getType() {
-    return this.type;
-  }
-
   // Util
   isInGrid(x, y) {
     return x >= 0 && x < this.gridw && y >= 0 && y < this.gridh;
+  }
+  isEmpty(x, y) {
+    return !this.isInGrid(x, y) || this.grid[x][y] === null;
   }
   isVertexInGrid(x, y) {
     return this.isInGrid(x, y) && isVertex(x, y);
@@ -48,6 +37,14 @@ class Puzzle {
   }
   isSideOfGrid(x, y) {
     return x === 0 || x === this.gridw - 1 || y === 0 || y === this.gridh - 1;
+  }
+  isCornerOfGrid(x, y) {
+    return (
+      (x === 0 && y === 0) ||
+      (x === this.gridw - 1 && y === 0) ||
+      (x === 0 && y === this.gridh - 1) ||
+      (x === this.gridw - 1 && y === this.gridh - 1)
+    );
   }
   isStart(x, y) {
     return this.isInGrid(x, y) && this.grid[x][y] && this.grid[x][y].isStart;
@@ -103,7 +100,8 @@ class Puzzle {
     } else {
       this.grid[x][y] = { isEnd: true };
     }
-    if (isVertex(x, y)) this.grid[x][y].endOrientation = Orientation.VERTICAL;
+    if (this.isCornerOfGrid(x, y))
+      this.grid[x][y].endOrientation = Orientation.VERTICAL;
   }
 
   removeEnd(x, y) {
@@ -114,10 +112,22 @@ class Puzzle {
     this.grid[x][y].isEnd = false;
   }
 
+  getEndOrientation(x, y) {
+    if (
+      !this.isEnd(x, y) ||
+      !this.isCornerOfGrid(x, y) ||
+      !this.grid[x][y].hasOwnProperty("endOrientation") ||
+      !(this.grid[x][y].endOrientation in Object.values(Orientation))
+    ) {
+      return null;
+    }
+    return this.grid[x][y].endOrientation;
+  }
+
   setEndOrientation(x, y, o) {
     if (
       !this.isEnd(x, y) ||
-      !this.isVertexInGrid(x, y) ||
+      !this.isCornerOfGrid(x, y) ||
       !(o in Object.values(Orientation))
     ) {
       throw new Error("Puzzle Error: Failed to set end orientation");

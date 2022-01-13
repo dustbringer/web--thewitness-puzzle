@@ -5,7 +5,7 @@ import useStateRef from "../hooks/useStateRef";
 import PuzzleLineRaw from "./PuzzleLineRaw";
 import PuzzleLineStart from "./PuzzleLineStart";
 
-import PuzzleClass from "../classes/Puzzle";
+import Puzzle from "../classes/Puzzle";
 import Direction from "../enums/Direction";
 import {
   getDirX,

@@ -1,14 +1,14 @@
 import * as React from "react";
 import { LINEWIDTH, ENDLENGTH } from "./info";
 
-function End(props) {
+function EndDiagonal(props) {
   return (
     <g {...props}>
       <line
         x1="50"
-        y1={`${50 - ENDLENGTH}`}
-        x2="50"
-        y2="50"
+        y1="50"
+        x2={`${50 - ENDLENGTH}`}
+        y2={`${50 - ENDLENGTH}`}
         stroke="black"
         strokeWidth={LINEWIDTH}
         strokeLinecap="round"
@@ -17,4 +17,4 @@ function End(props) {
   );
 }
 
-export default End;
+export default EndDiagonal;

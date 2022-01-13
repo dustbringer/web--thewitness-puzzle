@@ -8,6 +8,7 @@ import breakSVG from "./visuals/break.svg";
 
 import PuzzleClass from "./classes/Puzzle";
 import { VtxSym, SpcSym, EdgSym } from "./enums/Sym";
+import Orientation from "./enums/Orientation";
 
 function App() {
   const p = new PuzzleClass(4, 4);
@@ -19,6 +20,7 @@ function App() {
   p.addEnd(0, 2);
   p.addEnd(0, 3);
   p.addEnd(0, 4);
+
   // p.addEdgSym(0, 1, EdgSym.BREAK);
   // p.addEdgSym(1, 0, EdgSym.BREAK);
   // p.addEdgSym(2, 1, EdgSym.BREAK);
