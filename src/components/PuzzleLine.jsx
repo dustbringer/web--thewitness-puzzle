@@ -105,18 +105,18 @@ function PuzzleLine({ puzzle, width }) {
       minDist,
       maxDir,
       minDir,
-    } = getDirInfo(x, y);
+    } = getDirInfo(x, y, updatedDir);
 
     // Current vertex that the line attaches to
-    const currPoint =
+    let currPoint =
       linePointsRef.current.length > 0
         ? linePointsRef.current[linePointsRef.current.length - 1]
         : null;
-    const prevPoint =
+    let prevPoint =
       linePointsRef.current.length > 1
         ? linePointsRef.current[linePointsRef.current.length - 2]
         : null;
-    const nextPoint =
+    let nextPoint =
       currPoint !== null && updatedDir !== Direction.NONE
         ? pointInDir(updatedDir, currPoint)
         : null;
@@ -142,22 +142,37 @@ function PuzzleLine({ puzzle, width }) {
       if (outOfBounds(currPoint, updatedDir)) {
         updatedDist = 0;
       }
+    // } else if (updatedDist >= EDGESEGMAX - turnLeeway) {
+    //   if (updatedDir !== maxDir) {
+    //     updatedDist += maxDistAbs;
+    //   } else {
+    //     updatedDist += distDiff;
+    //   }
+
+    //   if(updatedDist >= EDGESEGMAX) {
+    //     updatedDir = maxDir;
+    //   }
     } else {
       // Corner turn assist (moving in a about perpendicular direction to edge)
       // if (!sameAxis(maxDir, updatedDir) && maxDistAbs > 1) {
-      //   distDiff += updatedDist > EDGESEGMAX / 2 ? assistSpeed : -assistSpeed;
+      //   distDiff += (updatedDist > EDGESEGMAX / 2 ? 1 : -1) * maxDistAbs;
+      //   distDiff = capVal(distDiff, EDGESEGMAX - updatedDist);
       // }
 
       // New turn assist (doesnt work well, try again after 'updatedDist >= EDGESEGMAX - turnLeeway')
       // If some movement in perp direction, add it to value in current direction
-      // if (
-      //   !sameAxis(maxDir, updatedDir) &&
-      //   maxDistAbs > 1 &&
-      //   updatedDist >= turnLeeway &&
-      //   updatedDist <= EDGESEGMAX - turnLeeway
-      // ) {
-      //   distDiff += maxDistAbs * Math.sign(minDist);
-      // }
+      if (
+        !sameAxis(maxDir, updatedDir) &&
+        maxDistAbs > 1 &&
+        updatedDist >= turnLeeway &&
+        updatedDist <= EDGESEGMAX - turnLeeway
+      ) {
+        distDiff +=
+          Math.floor(maxDistAbs / 2) *
+          Math.sign(minDist) *
+          dirToSign(updatedDir);
+        distDiff = capVal(distDiff, EDGESEGMAX - updatedDist);
+      }
 
       if (
         containsPoint(nextPoint, linePointsRef.current) && // been to next point
@@ -176,6 +191,9 @@ function PuzzleLine({ puzzle, width }) {
       if (outOfBounds(nextPoint, updatedDir)) {
         updatedDist = 0;
       }
+
+      prevPoint = {...currPoint};
+      currPoint = {...nextPoint}
     }
 
     /*
