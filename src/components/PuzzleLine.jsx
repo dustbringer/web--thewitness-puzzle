@@ -22,7 +22,7 @@ import { PIECESZ, STARTRAD, LINEWIDTH, BREAKWIDTH } from "./PuzzlePiece/info";
 
 // TODO: update this
 const EDGESEGMAX = 200;
-const turnLeeway = 4;
+const turnLeeway = 15;
 const moveCap = 60;
 const assistSpeed = 5;
 
@@ -142,16 +142,16 @@ function PuzzleLine({ puzzle, width }) {
       if (outOfBounds(currPoint, updatedDir)) {
         updatedDist = 0;
       }
-    // } else if (updatedDist >= EDGESEGMAX - turnLeeway) {
-    //   if (updatedDir !== maxDir) {
-    //     updatedDist += maxDistAbs;
-    //   } else {
-    //     updatedDist += distDiff;
-    //   }
+    } else if (updatedDist >= EDGESEGMAX - (turnLeeway * 3)) {
+      if (!sameAxis(updatedDir, maxDir)) {
+        updatedDist += maxDistAbs;
+      } else {
+        updatedDist += distDiff;
+      }
 
-    //   if(updatedDist >= EDGESEGMAX) {
-    //     updatedDir = maxDir;
-    //   }
+      if(updatedDist >= EDGESEGMAX) {
+        updatedDir = maxDir;
+      }
     } else {
       // Corner turn assist (moving in a about perpendicular direction to edge)
       // if (!sameAxis(maxDir, updatedDir) && maxDistAbs > 1) {
@@ -161,18 +161,18 @@ function PuzzleLine({ puzzle, width }) {
 
       // New turn assist (doesnt work well, try again after 'updatedDist >= EDGESEGMAX - turnLeeway')
       // If some movement in perp direction, add it to value in current direction
-      if (
-        !sameAxis(maxDir, updatedDir) &&
-        maxDistAbs > 1 &&
-        updatedDist >= turnLeeway &&
-        updatedDist <= EDGESEGMAX - turnLeeway
-      ) {
-        distDiff +=
-          Math.floor(maxDistAbs / 2) *
-          Math.sign(minDist) *
-          dirToSign(updatedDir);
-        distDiff = capVal(distDiff, EDGESEGMAX - updatedDist);
-      }
+      // if (
+      //   !sameAxis(maxDir, updatedDir) &&
+      //   maxDistAbs > 1 &&
+      //   updatedDist >= turnLeeway &&
+      //   updatedDist <= EDGESEGMAX - turnLeeway
+      // ) {
+      //   distDiff +=
+      //     Math.floor(maxDistAbs / 2) *
+      //     Math.sign(minDist) *
+      //     dirToSign(updatedDir);
+      //   distDiff = capVal(distDiff, EDGESEGMAX - updatedDist);
+      // }
 
       if (
         containsPoint(nextPoint, linePointsRef.current) && // been to next point
@@ -193,7 +193,8 @@ function PuzzleLine({ puzzle, width }) {
       }
 
       prevPoint = {...currPoint};
-      currPoint = {...nextPoint}
+      currPoint = {...nextPoint};
+      console.log(`add point ${updatedDist}`);
     }
 
     /*
@@ -209,6 +210,7 @@ function PuzzleLine({ puzzle, width }) {
       });
       updatedDist = EDGESEGMAX - updatedDist;
       updatedDir = reverseDir(updatedDir);
+      console.log(`backtracking ${updatedDist}`);
     }
 
     setCurrDist(updatedDist);
