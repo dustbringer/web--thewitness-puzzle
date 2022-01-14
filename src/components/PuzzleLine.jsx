@@ -22,6 +22,7 @@ import { PIECESZ, STARTRAD, LINEWIDTH, BREAKWIDTH } from "./PuzzlePiece/info";
 
 // TODO: update this
 const EDGESEGMAX = 200;
+const turnLeeway = 4;
 const moveCap = 60;
 const assistSpeed = 5;
 
@@ -83,11 +84,15 @@ function PuzzleLine({ puzzle, width }) {
     // TODO: end of puzzle
     // TODO: account for starting position on edge
 
-    let updatedDist = currDistRef.current;
-    let updatedDir = currDirRef.current;
-
     const x = capVal(e.movementX, moveCap);
     const y = capVal(e.movementY, moveCap);
+
+    let updatedDist = currDistRef.current;
+    let updatedDir = currDirRef.current;
+    let distDiff =
+      updatedDir !== Direction.NONE
+        ? (isHorizontal(updatedDir) ? x : y) * dirToSign(updatedDir)
+        : 0;
 
     const {
       xDir,
@@ -112,53 +117,55 @@ function PuzzleLine({ puzzle, width }) {
         ? linePointsRef.current[linePointsRef.current.length - 2]
         : null;
     const nextPoint =
-      currPoint !== null ? pointInDir(updatedDir, currPoint) : null;
+      currPoint !== null && updatedDir !== Direction.NONE
+        ? pointInDir(updatedDir, currPoint)
+        : null;
 
     // check if near vertex
     // TODO: does not account for moving into the vertex
     // TODO: changing direction at edge flicks out into edge
     // caused by add maxDistAbs to updatedDist
-    if (updatedDist <= 4) {
-      updatedDir = maxDir;
-      updatedDist += maxDistAbs;
+    if (updatedDist <= turnLeeway) {
+      if (updatedDir === Direction.NONE) {
+        updatedDir = maxDir;
+      } else if (!sameAxis(maxDir, updatedDir)) {
+        updatedDist -= maxDistAbs;
+      } else {
+        updatedDist += distDiff;
+      }
+
+      if (updatedDist <= 0) {
+        updatedDir = maxDir;
+        updatedDist = Math.abs(updatedDist);
+      }
+
       if (outOfBounds(currPoint, updatedDir)) {
         updatedDist = 0;
       }
     } else {
-      let distDiff = (isHorizontal(updatedDir) ? x : y) * dirToSign(updatedDir);
-
       // Corner turn assist (moving in a about perpendicular direction to edge)
-      if (!sameAxis(maxDir, updatedDir) && maxDistAbs > 1) {
-        distDiff += updatedDist > EDGESEGMAX / 2 ? assistSpeed : -assistSpeed;
-      }
+      // if (!sameAxis(maxDir, updatedDir) && maxDistAbs > 1) {
+      //   distDiff += updatedDist > EDGESEGMAX / 2 ? assistSpeed : -assistSpeed;
+      // }
 
-      // New turn assist (doesnt work well, try again after 'updatedDist >= EDGESEGMAX - 4')
+      // New turn assist (doesnt work well, try again after 'updatedDist >= EDGESEGMAX - turnLeeway')
       // If some movement in perp direction, add it to value in current direction
       // if (
       //   !sameAxis(maxDir, updatedDir) &&
       //   maxDistAbs > 1 &&
-      //   updatedDist >= 4 &&
-      //   updatedDist <= EDGESEGMAX - 4
+      //   updatedDist >= turnLeeway &&
+      //   updatedDist <= EDGESEGMAX - turnLeeway
       // ) {
       //   distDiff += maxDistAbs * Math.sign(minDist);
       // }
 
-      // TODO: this probably can be simplified
-      // check if distance should be added
       if (
-        // TODO: This first check can be factored out
-        !isLineCrossingPoint(updatedDist) || // not intersecting the next point
-        !containsPoint(nextPoint, linePointsRef.current) || // havent been to next point
-        distDiff < 0 // moving backwards
+        containsPoint(nextPoint, linePointsRef.current) && // been to next point
+        isLineCrossingPoint(updatedDist + distDiff) // move will cross over into next point
       ) {
-        if (
-          containsPoint(nextPoint, linePointsRef.current) && // been to next point
-          isLineCrossingPoint(updatedDist + distDiff) // move will cross over into next point
-        ) {
-          updatedDist = EDGESEGMAX - LINEWIDTH * 2;
-        } else {
-          updatedDist += distDiff;
-        }
+        updatedDist = EDGESEGMAX - LINEWIDTH * 2;
+      } else {
+        updatedDist += distDiff;
       }
     }
 
