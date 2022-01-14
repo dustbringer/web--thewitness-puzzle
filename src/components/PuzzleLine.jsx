@@ -22,7 +22,7 @@ import { PIECESZ, STARTRAD, LINEWIDTH, BREAKWIDTH } from "./PuzzlePiece/info";
 
 // TODO: update this
 const EDGESEGMAX = 200;
-const turnLeeway = 15;
+const turnLeeway = 30;
 const moveCap = 60;
 const assistSpeed = 5;
 
@@ -78,7 +78,6 @@ function PuzzleLine({ puzzle, width }) {
     // TODO: check if a valid edge exists in desired direction
     // TODO: replace out of bounds with checking for valid edge
     // TODO: clicking escape should remove all line segments
-    // TODO: circle at start
     // TODO: can't go into start circle
     // TODO: update turning assist
     // TODO: end of puzzle
@@ -142,7 +141,7 @@ function PuzzleLine({ puzzle, width }) {
       if (outOfBounds(currPoint, updatedDir)) {
         updatedDist = 0;
       }
-    } else if (updatedDist >= EDGESEGMAX - (turnLeeway * 3)) {
+    } else if (updatedDist >= EDGESEGMAX - turnLeeway) {
       if (!sameAxis(updatedDir, maxDir)) {
         updatedDist += maxDistAbs;
       } else {
