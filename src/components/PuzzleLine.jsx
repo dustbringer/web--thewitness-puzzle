@@ -100,7 +100,7 @@ function PuzzleLine({ puzzle, width }) {
       minDist,
       maxDir,
       minDir,
-    } = getDirInfo(x, y);
+    } = getDirInfo(x, y, updatedDir);
 
     // Current vertex that the line attaches to
     const currPoint =
@@ -128,20 +128,27 @@ function PuzzleLine({ puzzle, width }) {
       let distDiff = (isHorizontal(updatedDir) ? x : y) * dirToSign(updatedDir);
 
       // Corner turn assist (moving in a about perpendicular direction to edge)
-      if (!sameAxis(maxDir, updatedDir) && maxDistAbs > 1) {
-        distDiff += updatedDist > EDGESEGMAX / 2 ? assistSpeed : -assistSpeed;
-      }
+      // if (!sameAxis(maxDir, updatedDir) && maxDistAbs > 1) {
+      //   distDiff += (updatedDist > EDGESEGMAX / 2 ? 1 : -1) * maxDistAbs;
+      //   distDiff = capVal(distDiff, EDGESEGMAX - updatedDist);
+      // }
 
       // New turn assist (doesnt work well, try again after 'updatedDist >= EDGESEGMAX - 4')
       // If some movement in perp direction, add it to value in current direction
-      // if (
-      //   !sameAxis(maxDir, updatedDir) &&
-      //   maxDistAbs > 1 &&
-      //   updatedDist >= 4 &&
-      //   updatedDist <= EDGESEGMAX - 4
-      // ) {
-      //   distDiff += maxDistAbs * Math.sign(minDist);
-      // }
+      if (
+        !sameAxis(maxDir, updatedDir) &&
+        maxDistAbs > 1 &&
+        updatedDist >= 4 &&
+        updatedDist <= EDGESEGMAX - 4
+      ) {
+        distDiff +=
+          Math.floor(maxDistAbs / 2) *
+          Math.sign(minDist) *
+          dirToSign(updatedDir);
+        distDiff = capVal(distDiff, EDGESEGMAX - updatedDist);
+      }
+
+      // New turning assist near corners, old on edge
 
       // TODO: this probably can be simplified
       // check if distance should be added
