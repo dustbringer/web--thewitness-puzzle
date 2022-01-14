@@ -12,16 +12,21 @@ export const getDirY = (y) => {
   else return Direction.NONE;
 };
 
-export const getDirInfo = (x, y) => {
+/*
+ * Naming: max* = corresponding to x or y with larger magnitude
+ *         min* = corresponding to x or y with smaller magnitude
+ *
+ * Note: when both x and y have the same magnitude, max* corresponds
+ *       to x or y with the same axis as the current direction
+ */
+export const getDirInfo = (x, y, currDir) => {
   const xAbs = Math.abs(x);
   const yAbs = Math.abs(y);
-  const maxDistAbs = Math.max(xAbs, yAbs);
-  const minDistAbs = Math.min(xAbs, yAbs);
-
   const xDir = getDirX(x);
   const yDir = getDirY(y);
-  let maxDir, minDir, minDist, maxDist;
-  if (xAbs >= yAbs) {
+
+  let maxDir, minDir, maxDist, minDist;
+  if (xAbs > yAbs || (xAbs === yAbs && isHorizontal(currDir))) {
     maxDir = getDirX(x);
     minDir = getDirY(y);
     maxDist = x;
@@ -32,15 +37,18 @@ export const getDirInfo = (x, y) => {
     maxDist = y;
     minDist = x;
   }
+  const maxDistAbs = Math.abs(maxDist);
+  const minDistAbs = Math.abs(minDist);
+
   return {
-    xDir,
-    yDir,
     xAbs,
     yAbs,
-    maxDistAbs,
-    minDistAbs,
+    xDir,
+    yDir,
     maxDist,
     minDist,
+    maxDistAbs,
+    minDistAbs,
     maxDir,
     minDir,
   };
