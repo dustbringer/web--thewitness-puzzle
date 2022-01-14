@@ -18,12 +18,20 @@ import {
 } from "../util/directionUtil";
 import { getViewboxSize } from "../util/puzzleDisplayUtil";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
-import { PIECESZ, STARTRAD, LINEWIDTH, BREAKWIDTH } from "./PuzzlePiece/info";
+import {
+  PIECESZ,
+  _STARTRAD,
+  _LINEWIDTH,
+  _BREAKWIDTH,
+} from "./PuzzlePiece/info";
 
-const EDGESEGMAX = PIECESZ * 2;
+const pieceszScale = 2;
+const EDGESEGMAX = PIECESZ * pieceszScale;
+const LINERAD = (_LINEWIDTH / 2) * pieceszScale;
+const STARTRAD = _STARTRAD * pieceszScale;
+const BREAKWIDTH = _BREAKWIDTH * pieceszScale;
 const turnLeeway = 30;
 const moveCap = 60;
-const assistSpeed = 5;
 
 const capVal = (val, cap) => (Math.abs(val) > cap ? cap * Math.sign(val) : val);
 
@@ -40,18 +48,16 @@ function PuzzleLine({ puzzle, width }) {
     (curr.y >= puzzle.gridh - 1 && dir === Direction.DOWN);
 
   const isLineCrossingPoint = (dist) => {
-    return dist + LINEWIDTH > EDGESEGMAX - LINEWIDTH;
+    return dist + LINERAD > EDGESEGMAX - LINERAD;
   };
 
   const isLineCrossingStart = (dist) => {
-    return dist + LINEWIDTH > EDGESEGMAX - STARTRAD * 2;
+    return dist + LINERAD > EDGESEGMAX - STARTRAD;
   };
 
   const isLineCrossingBreak = (dist) => {
-    return dist + LINEWIDTH > (EDGESEGMAX - BREAKWIDTH) / 2;
+    return dist + LINERAD > (EDGESEGMAX - BREAKWIDTH) / 2;
   };
-
-  // updatedDist + distDiff > EDGESEGMAX - LINEWIDTH * 2
 
   const pointInDir = (dir, p) =>
     isHorizontal(dir)
@@ -118,6 +124,11 @@ function PuzzleLine({ puzzle, width }) {
         ? pointInDir(updatedDir, currPoint)
         : null;
 
+    // Turn assist
+    // if (!sameAxis(maxDir, updatedDir)) {
+    //   distDiff += (updatedDist > EDGESEGMAX / 2 ? 1 : -1) * maxDistAbs;
+    // }
+
     // check if near vertex
     if (updatedDist <= turnLeeway) {
       if (updatedDir === Direction.NONE) {
@@ -178,10 +189,10 @@ function PuzzleLine({ puzzle, width }) {
           nextPoint.y === linePointsRef.current[0].y &&
           isLineCrossingStart(updatedDist + distDiff)
         ) {
-          updatedDist = EDGESEGMAX - LINEWIDTH - STARTRAD * 2;
+          updatedDist = EDGESEGMAX - LINERAD - STARTRAD * 2;
         } else if (isLineCrossingPoint(updatedDist + distDiff)) {
           // move will cross over into next point
-          updatedDist = EDGESEGMAX - LINEWIDTH * 2;
+          updatedDist = EDGESEGMAX - LINERAD * 2;
         }
       }
     }
