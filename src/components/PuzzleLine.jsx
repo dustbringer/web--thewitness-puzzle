@@ -20,8 +20,7 @@ import { getViewboxSize } from "../util/puzzleDisplayUtil";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
 import { PIECESZ, STARTRAD, LINEWIDTH, BREAKWIDTH } from "./PuzzlePiece/info";
 
-// TODO: update this
-const EDGESEGMAX = 200;
+const EDGESEGMAX = PIECESZ * 2;
 const turnLeeway = 30;
 const moveCap = 60;
 const assistSpeed = 5;
@@ -44,8 +43,12 @@ function PuzzleLine({ puzzle, width }) {
     return dist + LINEWIDTH > EDGESEGMAX - LINEWIDTH;
   };
 
-  const isLineCrossingBreak = (updatedDist) => {
-    return updatedDist + LINEWIDTH > (EDGESEGMAX - BREAKWIDTH) / 2;
+  const isLineCrossingStart = (dist) => {
+    return dist + LINEWIDTH > EDGESEGMAX - STARTRAD * 2;
+  };
+
+  const isLineCrossingBreak = (dist) => {
+    return dist + LINEWIDTH > (EDGESEGMAX - BREAKWIDTH) / 2;
   };
 
   // updatedDist + distDiff > EDGESEGMAX - LINEWIDTH * 2
@@ -64,14 +67,8 @@ function PuzzleLine({ puzzle, width }) {
     );
   };
 
-  // TODO: FIXME: there is a better way of doing this using Array.prototype.some()
   const containsPoint = (p, pArr) => {
-    for (let i of pArr) {
-      if (i.x === p.x && i.y === p.y) {
-        return true;
-      }
-    }
-    return false;
+    return pArr.some((e) => e.x === p.x && e.y === p.y);
   };
 
   const handleMouseMove = (e) => {
@@ -82,6 +79,8 @@ function PuzzleLine({ puzzle, width }) {
     // TODO: update turning assist
     // TODO: end of puzzle
     // TODO: account for starting position on edge
+    // TODO: changing direction at edge flicks out into edge
+    // TODO: moving mouse towards out of bounds locks line when moving slowly on edge
 
     const x = capVal(e.movementX, moveCap);
     const y = capVal(e.movementY, moveCap);
@@ -121,9 +120,6 @@ function PuzzleLine({ puzzle, width }) {
         : null;
 
     // check if near vertex
-    // TODO: does not account for moving into the vertex
-    // TODO: changing direction at edge flicks out into edge
-    // caused by add maxDistAbs to updatedDist
     if (updatedDist <= turnLeeway) {
       if (updatedDir === Direction.NONE) {
         updatedDir = maxDir;
@@ -148,7 +144,7 @@ function PuzzleLine({ puzzle, width }) {
         updatedDist += distDiff;
       }
 
-      if(updatedDist >= EDGESEGMAX) {
+      if (updatedDist >= EDGESEGMAX) {
         updatedDir = maxDir;
       }
     } else {
@@ -173,13 +169,21 @@ function PuzzleLine({ puzzle, width }) {
       //   distDiff = capVal(distDiff, EDGESEGMAX - updatedDist);
       // }
 
+      updatedDist += distDiff;
+
       if (
-        containsPoint(nextPoint, linePointsRef.current) && // been to next point
-        isLineCrossingPoint(updatedDist + distDiff) // move will cross over into next point
+        containsPoint(nextPoint, linePointsRef.current) // been to next point
       ) {
-        updatedDist = EDGESEGMAX - LINEWIDTH * 2;
-      } else {
-        updatedDist += distDiff;
+        if (
+          nextPoint.x === linePointsRef.current[0].x &&
+          nextPoint.y === linePointsRef.current[0].y &&
+          isLineCrossingStart(updatedDist + distDiff)
+        ) {
+          updatedDist = EDGESEGMAX - LINEWIDTH - STARTRAD * 2;
+        } else if (isLineCrossingPoint(updatedDist + distDiff)) {
+          // move will cross over into next point
+          updatedDist = EDGESEGMAX - LINEWIDTH * 2;
+        }
       }
     }
 
@@ -191,8 +195,8 @@ function PuzzleLine({ puzzle, width }) {
         updatedDist = 0;
       }
 
-      prevPoint = {...currPoint};
-      currPoint = {...nextPoint};
+      prevPoint = { ...currPoint };
+      currPoint = { ...nextPoint };
       console.log(`add point ${updatedDist}`);
     }
 
