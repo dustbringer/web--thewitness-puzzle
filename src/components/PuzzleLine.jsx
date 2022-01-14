@@ -73,9 +73,8 @@ function PuzzleLine({ puzzle, width }) {
     );
   };
 
-  const containsPoint = (p, pArr) => {
-    return pArr.some((e) => e.x === p.x && e.y === p.y);
-  };
+  const pointEquals = (p1, p2) => p1.x === p2.x && p1.y === p2.y;
+  const containsPoint = (p, pArr) => pArr.some((e) => pointEquals(e, p));
 
   const handleMouseMove = (e) => {
     // TODO: check if a valid edge exists in desired direction
