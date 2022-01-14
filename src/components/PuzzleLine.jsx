@@ -75,7 +75,6 @@ function PuzzleLine({ puzzle, width }) {
     // TODO: check if a valid edge exists in desired direction
     // TODO: replace out of bounds with checking for valid edge
     // TODO: clicking escape should remove all line segments
-    // TODO: can't go into start circle
     // TODO: update turning assist
     // TODO: end of puzzle
     // TODO: account for starting position on edge
