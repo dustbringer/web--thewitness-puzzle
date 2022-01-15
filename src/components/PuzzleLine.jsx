@@ -66,11 +66,15 @@ function PuzzleLine({ puzzle, width }) {
   };
 
   const pointInDir = (p, dir) =>
-    isHorizontal(dir)
-      ? { x: p.x + dirToSign(dir), y: p.y }
-      : { x: p.x, y: p.y + dirToSign(dir) };
+    dir === Direction.NONE
+      ? isHorizontal(dir)
+        ? { x: p.x + dirToSign(dir), y: p.y }
+        : { x: p.x, y: p.y + dirToSign(dir) }
+      : null;
 
   const vertInDir = (p, dir) => {
+    if (dir === Direction.NONE) return null;
+
     let newPoint = pointInDir(p, dir);
     while (puzzle.isInGrid(newPoint.x, newPoint.y)) {
       if (puzzle.isVertexInGrid(newPoint.x, newPoint.y)) {
@@ -82,7 +86,7 @@ function PuzzleLine({ puzzle, width }) {
     return null;
   };
 
-  const isBacktrackingPoint = (dir, currPoint, prevPoint) => {
+  const isBacktrackingPoint = (currPoint, prevPoint, dir) => {
     const comparisonPoint = vertInDir(currPoint, dir);
     return prevPoint !== null && pointEquals(comparisonPoint, prevPoint);
   };
@@ -102,7 +106,7 @@ function PuzzleLine({ puzzle, width }) {
     const x = capVal(e.movementX, moveCap);
     const y = capVal(e.movementY, moveCap);
 
-    if(x === 0 && y === 0) return;
+    if (x === 0 && y === 0) return;
 
     let updatedDist = currDistRef.current;
     let updatedDir = currDirRef.current;
@@ -188,7 +192,7 @@ function PuzzleLine({ puzzle, width }) {
     }
 
     // check if new point should be added
-    if ((updatedDist >= EDGESEGMAX) & (nextVertex != null)) {
+    if (updatedDist >= EDGESEGMAX && nextVertex != null) {
       setLinePoints((points) => [...points, nextVertex]);
       updatedDist %= EDGESEGMAX;
       if (outOfBounds(nextVertex, updatedDir)) {
@@ -197,7 +201,7 @@ function PuzzleLine({ puzzle, width }) {
 
       prevPoint = currPoint;
       currPoint = nextVertex;
-      console.log(`add point ${updatedDist}`);
+      console.log(`added point`);
     }
 
     /*
@@ -207,12 +211,13 @@ function PuzzleLine({ puzzle, width }) {
      * the current line segment to feel like it is controlling the removed edge.
      */
     // check if last point needs removing
-    if (isBacktrackingPoint(updatedDir, currPoint, prevPoint)) {
+    if (isBacktrackingPoint(currPoint, prevPoint, updatedDir)) {
       setLinePoints((points) => {
         return points.slice(0, points.length - 1);
       });
       updatedDist = EDGESEGMAX - updatedDist;
       updatedDir = reverseDir(updatedDir);
+      console.log(`removed point ${currPoint}`);
     }
 
     setCurrDist(updatedDist);
