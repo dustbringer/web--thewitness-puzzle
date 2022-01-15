@@ -91,7 +91,6 @@ function PuzzleLine({ puzzle, width }) {
     // TODO: check if a valid edge exists in desired direction
     // TODO: replace out of bounds with checking for valid edge
     // TODO: clicking escape should remove all line segments
-    // TODO: update turning assist
     // TODO: end of puzzle
     // TODO: account for starting position on edge
     // TODO: changing direction at edge flicks out into edge
@@ -147,7 +146,7 @@ function PuzzleLine({ puzzle, width }) {
 
     // Turn assist (maxDir perpendicular to edge)
     if (!sameAxis(maxDir, updatedDir)) {
-      distDiff += (updatedDist > EDGESEGMAX / 2 ? 1 : -1) * maxDistAbs;
+      distDiff = (updatedDist > EDGESEGMAX / 2 ? 1 : -1) * maxDistAbs;
     }
 
     updatedDist += distDiff;
