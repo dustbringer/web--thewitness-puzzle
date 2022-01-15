@@ -67,6 +67,8 @@ class Puzzle {
       exists(x + 1, y) + exists(x - 1, y) + exists(x, y + 1) + exists(x, y - 1)
     );
   }
+  gridPoint = (p) =>
+    this.isInGrid(p.x, p.y) ? this.grid[p.x][p.y] : null;
 
   // Method
   addStart(x, y) {

@@ -32,6 +32,7 @@ const STARTRAD = _STARTRAD * pieceszScale;
 const BREAKWIDTH = _BREAKWIDTH * pieceszScale;
 const turnLeeway = 30;
 const moveCap = 60;
+const perpCap = 30;
 
 const capVal = (val, cap) => (Math.abs(val) > cap ? cap * Math.sign(val) : val);
 
@@ -42,9 +43,6 @@ function PuzzleLine({ puzzle, width }) {
   const [currDist, setCurrDist, currDistRef] = useStateRef(0);
 
   const pointEquals = (p1, p2) => p1 && p2 && p1.x === p2.x && p1.y === p2.y;
-
-  const gridPoint = (p) =>
-    puzzle.isInGrid(p.x, p.y) ? puzzle.grid[p.x][p.y] : null;
 
   const outOfBounds = (curr, dir) =>
     (curr.x === 0 && dir === Direction.LEFT) ||
@@ -95,6 +93,7 @@ function PuzzleLine({ puzzle, width }) {
     // TODO: account for starting position on edge
     // TODO: changing direction at edge flicks out into edge
     // TODO: moving mouse towards out of bounds locks line when moving slowly on edge
+    // TODO: scale movement speed (can be used as sensitivity setting)
 
     const x = capVal(e.movementX, moveCap);
     const y = capVal(e.movementY, moveCap);
@@ -146,7 +145,7 @@ function PuzzleLine({ puzzle, width }) {
 
     // Turn assist (maxDir perpendicular to edge)
     if (!sameAxis(maxDir, updatedDir)) {
-      distDiff = (updatedDist > EDGESEGMAX / 2 ? 1 : -1) * maxDistAbs;
+      distDiff = (updatedDist > EDGESEGMAX / 2 ? 1 : -1) * capVal(maxDistAbs, perpCap);
     }
 
     updatedDist += distDiff;
