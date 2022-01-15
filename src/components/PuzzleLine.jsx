@@ -43,9 +43,8 @@ function PuzzleLine({ puzzle, width }) {
 
   const pointEquals = (p1, p2) => p1 && p2 && p1.x === p2.x && p1.y === p2.y;
 
-  const gridPoint = (p) => {
-    return puzzle.isInGrid(p.x, p.y) ? puzzle.grid[p.x][p.y] : null;
-  };
+  const gridPoint = (p) =>
+    puzzle.isInGrid(p.x, p.y) ? puzzle.grid[p.x][p.y] : null;
 
   const outOfBounds = (curr, dir) =>
     (curr.x === 0 && dir === Direction.LEFT) ||
@@ -53,20 +52,15 @@ function PuzzleLine({ puzzle, width }) {
     (curr.y === 0 && dir === Direction.UP) ||
     (curr.y >= puzzle.gridh - 1 && dir === Direction.DOWN);
 
-  const isLineCrossingPoint = (dist) => {
-    return dist + LINERAD > EDGESEGMAX - LINERAD;
-  };
+  const isLineCrossingPoint = (dist) => dist + LINERAD > EDGESEGMAX - LINERAD;
 
-  const isLineCrossingStart = (dist) => {
-    return dist + LINERAD > EDGESEGMAX - STARTRAD;
-  };
+  const isLineCrossingStart = (dist) => dist + LINERAD > EDGESEGMAX - STARTRAD;
 
-  const isLineCrossingBreak = (dist) => {
-    return dist + LINERAD > (EDGESEGMAX - BREAKWIDTH) / 2;
-  };
+  const isLineCrossingBreak = (dist) =>
+    dist + LINERAD > (EDGESEGMAX - BREAKWIDTH) / 2;
 
   const pointInDir = (p, dir) =>
-    dir === Direction.NONE
+    dir !== Direction.NONE
       ? isHorizontal(dir)
         ? { x: p.x + dirToSign(dir), y: p.y }
         : { x: p.x, y: p.y + dirToSign(dir) }
@@ -86,10 +80,10 @@ function PuzzleLine({ puzzle, width }) {
     return null;
   };
 
-  const isBacktrackingPoint = (currPoint, prevPoint, dir) => {
-    const comparisonPoint = vertInDir(currPoint, dir);
-    return prevPoint !== null && pointEquals(comparisonPoint, prevPoint);
-  };
+  const isBacktrackingPoint = (currPoint, prevPoint, dir) =>
+    dir !== Direction.NONE &&
+    prevPoint !== null &&
+    pointEquals(vertInDir(currPoint, dir), prevPoint);
 
   const containsPoint = (p, pArr) => pArr.some((e) => pointEquals(e, p));
 
@@ -217,7 +211,7 @@ function PuzzleLine({ puzzle, width }) {
       });
       updatedDist = EDGESEGMAX - updatedDist;
       updatedDir = reverseDir(updatedDir);
-      console.log(`removed point ${currPoint}`);
+      console.log(`removed point`);
     }
 
     setCurrDist(updatedDist);
