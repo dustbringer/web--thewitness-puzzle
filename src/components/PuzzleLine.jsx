@@ -43,6 +43,10 @@ function PuzzleLine({ puzzle, width }) {
 
   const pointEquals = (p1, p2) => p1 && p2 && p1.x === p2.x && p1.y === p2.y;
 
+  const gridPoint = (p) => {
+    return puzzle.isInGrid(p.x, p.y) ? puzzle.grid[p.x][p.y] : null;
+  };
+
   const outOfBounds = (curr, dir) =>
     (curr.x === 0 && dir === Direction.LEFT) ||
     (curr.x >= puzzle.gridw - 1 && dir === Direction.RIGHT) ||
@@ -61,13 +65,25 @@ function PuzzleLine({ puzzle, width }) {
     return dist + LINERAD > (EDGESEGMAX - BREAKWIDTH) / 2;
   };
 
-  const pointInDir = (dir, p) =>
+  const pointInDir = (p, dir) =>
     isHorizontal(dir)
-      ? { x: p.x + dirToSign(dir) * 2, y: p.y }
-      : { x: p.x, y: p.y + dirToSign(dir) * 2 };
+      ? { x: p.x + dirToSign(dir), y: p.y }
+      : { x: p.x, y: p.y + dirToSign(dir) };
+
+  const vertInDir = (p, dir) => {
+    let newPoint = pointInDir(p, dir);
+    while (puzzle.isInGrid(newPoint.x, newPoint.y)) {
+      if (puzzle.isVertexInGrid(newPoint.x, newPoint.y)) {
+        return newPoint;
+      }
+      newPoint = pointInDir(newPoint, dir);
+    }
+
+    return null;
+  };
 
   const isBacktrackingPoint = (dir, currPoint, prevPoint) => {
-    const comparisonPoint = pointInDir(dir, currPoint);
+    const comparisonPoint = vertInDir(currPoint, dir);
     return prevPoint !== null && pointEquals(comparisonPoint, prevPoint);
   };
 
@@ -85,6 +101,8 @@ function PuzzleLine({ puzzle, width }) {
 
     const x = capVal(e.movementX, moveCap);
     const y = capVal(e.movementY, moveCap);
+
+    if(x === 0 && y === 0) return;
 
     let updatedDist = currDistRef.current;
     let updatedDir = currDirRef.current;
@@ -117,7 +135,11 @@ function PuzzleLine({ puzzle, width }) {
         : null;
     let nextPoint =
       currPoint !== null && updatedDir !== Direction.NONE
-        ? pointInDir(updatedDir, currPoint)
+        ? pointInDir(currPoint, updatedDir)
+        : null;
+    let nextVertex =
+      currPoint !== null && updatedDir !== Direction.NONE
+        ? vertInDir(currPoint, updatedDir)
         : null;
 
     // Replace NONE direction
@@ -153,9 +175,9 @@ function PuzzleLine({ puzzle, width }) {
     }
 
     // Self collision
-    if (containsPoint(nextPoint, linePointsRef.current)) {
+    if (containsPoint(nextVertex, linePointsRef.current)) {
       if (
-        pointEquals(nextPoint, linePointsRef.current[0]) &&
+        pointEquals(nextVertex, linePointsRef.current[0]) &&
         isLineCrossingStart(updatedDist + distDiff)
       ) {
         updatedDist = EDGESEGMAX - LINERAD - STARTRAD;
@@ -166,15 +188,15 @@ function PuzzleLine({ puzzle, width }) {
     }
 
     // check if new point should be added
-    if (updatedDist >= EDGESEGMAX && nextPoint != null) {
-      setLinePoints((points) => [...points, nextPoint]);
+    if ((updatedDist >= EDGESEGMAX) & (nextVertex != null)) {
+      setLinePoints((points) => [...points, nextVertex]);
       updatedDist %= EDGESEGMAX;
-      if (outOfBounds(nextPoint, updatedDir)) {
+      if (outOfBounds(nextVertex, updatedDir)) {
         updatedDist = 0;
       }
 
       prevPoint = currPoint;
-      currPoint = nextPoint;
+      currPoint = nextVertex;
       console.log(`add point ${updatedDist}`);
     }
 
@@ -191,7 +213,6 @@ function PuzzleLine({ puzzle, width }) {
       });
       updatedDist = EDGESEGMAX - updatedDist;
       updatedDir = reverseDir(updatedDir);
-      console.log(`backtracking ${updatedDist}`);
     }
 
     setCurrDist(updatedDist);
