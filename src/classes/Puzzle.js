@@ -1,4 +1,9 @@
-import { isVertex, isSpace, isEdge } from "../util/puzzleGridUtil";
+import {
+  isVertex,
+  isSpace,
+  isEdge,
+  verticesOfEdge,
+} from "../util/puzzleGridUtil";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
 import Orientation from "../enums/Orientation";
 
@@ -47,7 +52,6 @@ class Puzzle {
     );
   }
   isStart(x, y) {
-    // FIXME: Not start when there are no edges?
     return this.isInGrid(x, y) && this.grid[x][y] && this.grid[x][y].isStart;
   }
   isEnd(x, y) {
@@ -59,18 +63,16 @@ class Puzzle {
     );
   }
   countEdges(x, y) {
-    if (!this.isVertexInGrid(x, y)) {
-      return 0;
-    }
+    if (!this.isVertexInGrid(x, y)) return 0;
+
     const exists = (x, y) => (this.isInGrid(x, y) && this.grid[x][y] ? 1 : 0);
     return (
       exists(x + 1, y) + exists(x - 1, y) + exists(x, y + 1) + exists(x, y - 1)
     );
   }
-  gridPoint = (p) =>
-    this.isInGrid(p.x, p.y) ? this.grid[p.x][p.y] : null;
+  gridPoint = (p) => (this.isInGrid(p.x, p.y) ? this.grid[p.x][p.y] : null);
 
-  // Method
+  // Methods
   addStart(x, y) {
     if (
       (!this.isVertexInGrid(x, y) && !this.isEdgeInGrid(x, y)) ||
@@ -196,6 +198,19 @@ class Puzzle {
     if (this.grid[x][y]) delete this.grid[x][y].sym;
   }
 
+  addEdge(x, y) {
+    if (!this.isEdgeInGrid(x, y)) {
+      throw new Error("Puzzle Error: Failed to add edge");
+    }
+    if (!this.grid[x][y]) this.grid[x][y] = {};
+
+    // Add surrounding vertices
+    verticesOfEdge(x, y).forEach((v) => {
+      if (!this.isVertexInGrid(v.x, v.y)) return;
+      if (!this.grid[v.x][v.y]) this.grid[v.x][v.y] = {};
+    });
+  }
+
   removeEdge(x, y) {
     if (!this.isEdgeInGrid(x, y)) {
       throw new Error("Puzzle Error: Failed to remove edge");
@@ -203,12 +218,25 @@ class Puzzle {
     this.grid[x][y] = null;
     this.end = this.end.filter((e) => !(e.x === x && e.y === y));
     this.start = this.start.filter((e) => !(e.x === x && e.y === y));
+
+    // Remove surrounding vertices
+    verticesOfEdge(x, y).forEach((v) => {
+      if (!this.isVertexInGrid(v.x, v.y)) return;
+      if (this.grid[v.x][v.y] !== null && this.countEdges(v.x, v.y) === 0) {
+        this.grid[v.x][v.y] = null;
+        this.end = this.end.filter((e) => !(e.x === v.x && e.y === v.y));
+        this.start = this.start.filter((e) => !(e.x === v.x && e.y === v.y));
+      }
+    });
   }
 
-  removeVertex(x, y) {
-    // Not sure if we should allow this
-    return 0;
-  }
+  // Not needed: Included automatically when add/remove edges
+  // removeVertex(x, y) {
+  //   // Not sure if we should allow this
+  //   return 0;
+  // }
+
+  // TODO: Figure out if squares should be removed when edges are removed
 }
 
 export default Puzzle;
