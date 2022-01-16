@@ -56,7 +56,9 @@ function PuzzleLine({ puzzle, width }) {
 
   const isLineCrossingPoint = (dist) => dist + LINERAD > EDGESEGMAX - LINERAD;
 
-  const isLineCrossingStart = (dist) => dist + LINERAD > EDGESEGMAX - STARTRAD;
+  const isLineCrossingStart = (currP, existP, dist) =>
+    pointEquals(existP, linePointsRef.current[0]) &&
+    dist + LINERAD > sharedAxisDist(currP, existP) - STARTRAD;
 
   const isLineCrossingBreak = (dist) =>
     dist + LINERAD > (EDGESEGMAX - BREAKWIDTH) / 2;
@@ -88,7 +90,7 @@ function PuzzleLine({ puzzle, width }) {
     (pointEquals(vertInDir(currP, dir), prevP) ||
       pointEquals(pointInDir(currP, dir), prevP));
 
-  const containsPoint = (p, pArr) => pArr.some((e) => pointEquals(e, p));
+  const containsPoint = (pArr, p) => pArr.some((e) => pointEquals(e, p));
 
   // potentially unnecessary functions
   const isSharedAxis = (p1, p2) => p1.x === p2.x || p1.y === p2.y;
@@ -113,7 +115,6 @@ function PuzzleLine({ puzzle, width }) {
     // TODO: changing direction at edge flicks out into edge
     // TODO: moving mouse towards out of bounds locks line when moving slowly on edge
     // TODO: scale movement speed (can be used as sensitivity setting)
-    // TODO: line collision doesn't work for start on an edge
 
     const x = capVal(e.movementX, moveCap);
     const y = capVal(e.movementY, moveCap);
@@ -168,11 +169,10 @@ function PuzzleLine({ puzzle, width }) {
 
     // Turn assist (maxDir perpendicular to edge)
     if (!sameAxis(maxDir, updatedDir)) {
+      distDiff =
+        (updatedDist > EDGESEGMAX / 2 ? 1 : -1) * capVal(maxDistAbs, perpCap);
       if (puzzle.isEdgeInGrid(currPoint.x, currPoint.y)) {
-        distDiff = capVal(maxDistAbs, perpCap);
-      } else {
-        distDiff =
-          (updatedDist > EDGESEGMAX / 2 ? 1 : -1) * capVal(maxDistAbs, perpCap);
+        distDiff = Math.abs(distDiff);
       }
     }
 
@@ -189,7 +189,10 @@ function PuzzleLine({ puzzle, width }) {
       if (!isValidDir(currPoint, updatedDir)) {
         updatedDist = 0;
       }
-    } else if (currDistRef.current >= sharedAxisDist(currPoint, nextVertex) - turnLeeway) {
+    } else if (
+      currDistRef.current >=
+      sharedAxisDist(currPoint, nextVertex) - turnLeeway
+    ) {
       // Overshot turn
       if (updatedDist >= sharedAxisDist(currPoint, nextVertex)) {
         updatedDir = maxDir;
@@ -199,15 +202,20 @@ function PuzzleLine({ puzzle, width }) {
     }
 
     // Self collision
-    if (
-      nextVertex !== null &&
-      containsPoint(nextVertex, linePointsRef.current)
-    ) {
+    // FIXME: probably needs refactoring
+    // NOTE: POINT MUST BE CHECKED BEFORE VERTEX
+    const existingPoint = containsPoint(linePointsRef.current, nextPoint)
+      ? nextPoint
+      : containsPoint(linePointsRef.current, nextVertex)
+      ? nextVertex
+      : null;
+
+    if (existingPoint !== null) {
       if (
-        pointEquals(nextVertex, linePointsRef.current[0]) &&
-        isLineCrossingStart(updatedDist + distDiff)
+        isLineCrossingStart(currPoint, existingPoint, updatedDist + distDiff)
       ) {
-        updatedDist = EDGESEGMAX - LINERAD - STARTRAD;
+        updatedDist =
+          sharedAxisDist(currPoint, existingPoint) - LINERAD - STARTRAD;
       } else if (isLineCrossingPoint(updatedDist + distDiff)) {
         // move will cross over into next point
         updatedDist = EDGESEGMAX - LINERAD * 2;
