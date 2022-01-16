@@ -14,7 +14,7 @@ function App() {
   const p = new PuzzleClass(4, 4);
   p.addStart(8, 4);
   p.addStart(4, 4);
-  p.addStart(8, 0);
+  p.addStart(0, 8);
   p.addStart(0, 0);
   p.addStart(6, 7);
   p.addStart(1, 6);

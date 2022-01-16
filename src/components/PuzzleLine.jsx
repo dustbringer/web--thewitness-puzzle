@@ -162,8 +162,12 @@ function PuzzleLine({ puzzle, width }) {
     // Turn assist (maxDir perpendicular to edge)
     // FIXME: broken when near edge start
     if (!sameAxis(maxDir, updatedDir)) {
-      distDiff =
-        (updatedDist > EDGESEGMAX / 2 ? 1 : -1) * capVal(maxDistAbs, perpCap);
+      if(puzzle.isEdgeInGrid(currPoint.x, currPoint.y)) {
+        distDiff = capVal(maxDistAbs, perpCap);
+      } else {
+        distDiff =
+          (updatedDist > EDGESEGMAX / 2 ? 1 : -1) * capVal(maxDistAbs, perpCap);
+      }
     }
 
     updatedDist += distDiff;
