@@ -34,11 +34,11 @@ class Puzzle {
   isVertexInGrid(x, y) {
     return this.isInGrid(x, y) && isVertex(x, y);
   }
-  isSpaceInGrid(x, y) {
-    return this.isInGrid(x, y) && isSpace(x, y);
-  }
   isEdgeInGrid(x, y) {
     return this.isInGrid(x, y) && isEdge(x, y);
+  }
+  isSpaceInGrid(x, y) {
+    return this.isInGrid(x, y) && isSpace(x, y);
   }
   isSideOfGrid(x, y) {
     return x === 0 || x === this.gridw - 1 || y === 0 || y === this.gridh - 1;
