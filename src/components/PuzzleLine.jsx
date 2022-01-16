@@ -223,9 +223,14 @@ function PuzzleLine({ puzzle, width }) {
         updatedDist = 0;
       }
 
+<<<<<<< Updated upstream
       prevPoint = currPoint;
       currPoint = nextVertex;
       console.log("added point");
+=======
+      prevPoint = { ...currPoint };
+      currPoint = { ...nextPoint };
+>>>>>>> Stashed changes
     }
 
     /*
@@ -242,7 +247,10 @@ function PuzzleLine({ puzzle, width }) {
       updatedDist =
         PIECESZ * Math.abs(maxAxisDistAbs(currPoint, prevPoint)) - updatedDist;
       updatedDir = reverseDir(updatedDir);
+<<<<<<< Updated upstream
       console.log("removed point");
+=======
+>>>>>>> Stashed changes
     }
 
     setCurrDist(updatedDist);
