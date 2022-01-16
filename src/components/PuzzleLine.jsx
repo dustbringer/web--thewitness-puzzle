@@ -64,7 +64,7 @@ function PuzzleLine({ puzzle, width }) {
     dist + LINERAD > (EDGESEGMAX - BREAKWIDTH) / 2;
 
   const pointInDir = (p, dir) =>
-    dir !== Direction.NONE
+    dir !== Direction.NONE && p !== null
       ? isHorizontal(dir)
         ? { x: p.x + dirToSign(dir), y: p.y }
         : { x: p.x, y: p.y + dirToSign(dir) }
@@ -113,7 +113,6 @@ function PuzzleLine({ puzzle, width }) {
     // TODO: clicking escape should remove all line segments
     // TODO: end of puzzle
     // TODO: changing direction at edge flicks out into edge
-    // TODO: moving mouse towards out of bounds locks line when moving slowly on edge
     // TODO: scale movement speed (can be used as sensitivity setting)
 
     const x = capVal(e.movementX, moveCap);
@@ -168,7 +167,11 @@ function PuzzleLine({ puzzle, width }) {
     }
 
     // Turn assist (maxDir perpendicular to edge)
-    if (!sameAxis(maxDir, updatedDir)) {
+    if (
+      !sameAxis(maxDir, updatedDir) &&
+      nextVertex !== null &&
+      isValidDir(nextVertex, maxDir)
+    ) {
       distDiff =
         (updatedDist > EDGESEGMAX / 2 ? 1 : -1) * capVal(maxDistAbs, perpCap);
       if (puzzle.isEdgeInGrid(currPoint.x, currPoint.y)) {
@@ -178,25 +181,30 @@ function PuzzleLine({ puzzle, width }) {
 
     updatedDist += distDiff;
 
-    // Turning near vertex
-    if (currDistRef.current <= turnLeeway) {
-      // Overshot turn or backtracking
-      if (updatedDist <= 0) {
+    // FIXME: probably needs refactoring
+    if (updatedDist < 0) {
+      if (sameAxis(maxDir, updatedDir) && !isValidDir(currPoint, maxDir)) {
+        updatedDist = 0;
+      } else if (isValidDir(currPoint, maxDir)) {
         updatedDir = maxDir;
         updatedDist = Math.abs(updatedDist);
-      }
-
-      if (!isValidDir(currPoint, updatedDir)) {
-        updatedDist = 0;
+      } else if (
+        !sameAxis(maxDir, updatedDir) &&
+        !isValidDir(currPoint, maxDir)
+      ) {
+        if (isValidDir(currPoint, reverseDir(updatedDir))) {
+          updatedDir = reverseDir(updatedDir);
+          updatedDist = Math.abs(updatedDist);
+        } else {
+          updatedDist = 0;
+        }
       }
     } else if (
-      currDistRef.current >=
-      sharedAxisDist(currPoint, nextVertex) - turnLeeway
+      updatedDist >= sharedAxisDist(currPoint, nextVertex) &&
+      isValidDir(nextVertex, maxDir)
     ) {
       // Overshot turn
-      if (updatedDist >= sharedAxisDist(currPoint, nextVertex)) {
-        updatedDir = maxDir;
-      }
+      updatedDir = maxDir;
 
       // Out of bounds is handled later
     }
@@ -222,6 +230,11 @@ function PuzzleLine({ puzzle, width }) {
       }
     }
 
+    // FIXME: this probably should be somewhere else
+    if (!isValidDir(currPoint, updatedDir)) {
+      updatedDist = 0;
+    }
+
     // check if new point should be added
     // FIXME: probably needs refactoring
     if (
@@ -236,7 +249,6 @@ function PuzzleLine({ puzzle, width }) {
       if (!isValidDir(nextVertex, updatedDir)) {
         updatedDist = 0;
       }
-
       prevPoint = currPoint;
       currPoint = nextVertex;
       console.log("added point");

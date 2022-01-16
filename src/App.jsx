@@ -23,6 +23,7 @@ function App() {
   p.addEnd(0, 2);
   p.addEnd(0, 3);
   p.addEnd(0, 4);
+  p.addEnd(8, 0);
 
   // p.addEdgSym(0, 1, EdgSym.BREAK);
   // p.addEdgSym(1, 0, EdgSym.BREAK);
@@ -30,10 +31,10 @@ function App() {
   // p.addEdgSym(1, 2, EdgSym.BREAK);
   // p.addEdgSym(2, 3, EdgSym.BREAK);
   // p.addEdgSym(3, 2, EdgSym.BREAK);
-  p.addVtxSym(0, 2, VtxSym.DOT);
-  p.addSpcSym(1, 1, SpcSym.SUN);
+  // p.addVtxSym(0, 2, VtxSym.DOT);
+  // p.addSpcSym(1, 1, SpcSym.SUN);
 
-  console.log(p.grid);
+  // p = removedEdgeMaze2();
 
   return (
     <div>
