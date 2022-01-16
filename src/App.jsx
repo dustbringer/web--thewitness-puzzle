@@ -9,9 +9,10 @@ import { VtxSym, SpcSym, EdgSym } from "./enums/Sym";
 import Orientation from "./enums/Orientation";
 
 import removedEdgeMaze1 from "./puzzles/removedEdgeMaze1";
+import removedEdgeMaze2 from "./puzzles/removedEdgeMaze2";
 
 function App() {
-  const p = new PuzzleClass(4, 4);
+  let p = new PuzzleClass(4, 4);
   p.addStart(8, 4);
   p.addStart(4, 4);
   p.addStart(8, 0);
