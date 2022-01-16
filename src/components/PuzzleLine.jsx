@@ -150,11 +150,11 @@ function PuzzleLine({ puzzle, width }) {
         ? linePointsRef.current[linePointsRef.current.length - 2]
         : null;
     let nextPoint =
-      currPoint !== null && updatedDir !== Direction.NONE
+      currPoint !== null
         ? pointInDir(currPoint, updatedDir)
         : null;
     let nextVertex =
-      currPoint !== null && updatedDir !== Direction.NONE
+      currPoint !== null
         ? vertInDir(currPoint, updatedDir)
         : null;
 
@@ -230,15 +230,10 @@ function PuzzleLine({ puzzle, width }) {
       }
     }
 
-    // FIXME: this probably should be somewhere else
-    if (!isValidDir(currPoint, updatedDir)) {
-      updatedDist = 0;
-    }
-
     // check if new point should be added
     // FIXME: probably needs refactoring
     if (
-      nextVertex != null &&
+      nextVertex !== null &&
       !pointEquals(currPoint, nextVertex) &&
       isSharedAxis(currPoint, nextVertex) &&
       updatedDist >= sharedAxisDist(currPoint, nextVertex)
@@ -246,12 +241,14 @@ function PuzzleLine({ puzzle, width }) {
       setLinePoints((points) => [...points, nextVertex]);
       // possibly assign this distance to a variable
       updatedDist %= sharedAxisDist(currPoint, nextVertex);
-      if (!isValidDir(nextVertex, updatedDir)) {
-        updatedDist = 0;
-      }
       prevPoint = currPoint;
       currPoint = nextVertex;
       console.log("added point");
+    }
+
+    // FIXME: this probably should be somewhere else
+    if (!isValidDir(currPoint, updatedDir)) {
+      updatedDist = 0;
     }
 
     /*
