@@ -56,9 +56,8 @@ function PuzzleLine({ puzzle, width }) {
 
   const isLineCrossingPoint = (dist) => dist + LINERAD > EDGESEGMAX - LINERAD;
 
-  const isLineCrossingStart = (currP, existP, dist) =>
-    pointEquals(existP, linePointsRef.current[0]) &&
-    dist + LINERAD > sharedAxisDist(currP, existP) - STARTRAD;
+  const isLineCrossingStart = (distToLine, dist) =>
+    dist + LINERAD > distToLine - STARTRAD;
 
   const isLineCrossingBreak = (dist) =>
     dist + LINERAD > (EDGESEGMAX - BREAKWIDTH) / 2;
@@ -149,13 +148,9 @@ function PuzzleLine({ puzzle, width }) {
         ? linePointsRef.current[linePointsRef.current.length - 2]
         : null;
     let nextPoint =
-      currPoint !== null
-        ? pointInDir(currPoint, updatedDir)
-        : null;
+      currPoint !== null ? pointInDir(currPoint, updatedDir) : null;
     let nextVertex =
-      currPoint !== null
-        ? vertInDir(currPoint, updatedDir)
-        : null;
+      currPoint !== null ? vertInDir(currPoint, updatedDir) : null;
 
     // Replace NONE direction
     if (updatedDir === Direction.NONE) {
@@ -208,18 +203,23 @@ function PuzzleLine({ puzzle, width }) {
     // Self collision
     // FIXME: probably needs refactoring
     // NOTE: POINT MUST BE CHECKED BEFORE VERTEX
-    const existingPoint = containsPoint(linePointsRef.current, nextPoint)
+    const nextPointInLine = containsPoint(linePointsRef.current, nextPoint)
       ? nextPoint
       : containsPoint(linePointsRef.current, nextVertex)
       ? nextVertex
       : null;
 
-    if (existingPoint !== null) {
+    if (nextPointInLine !== null) {
       if (
-        isLineCrossingStart(currPoint, existingPoint, updatedDist + distDiff)
+        linePointsRef.current.length > 0 &&
+        pointEquals(nextPointInLine, linePointsRef.current[0]) &&
+        isLineCrossingStart(
+          sharedAxisDist(currPoint, nextPointInLine),
+          updatedDist + distDiff
+        )
       ) {
         updatedDist =
-          sharedAxisDist(currPoint, existingPoint) - LINERAD - STARTRAD;
+          sharedAxisDist(currPoint, nextPointInLine) - LINERAD - STARTRAD;
       } else if (isLineCrossingPoint(updatedDist + distDiff)) {
         // move will cross over into next point
         updatedDist = EDGESEGMAX - LINERAD * 2;
@@ -244,7 +244,8 @@ function PuzzleLine({ puzzle, width }) {
 
     // FIXME: this probably should be somewhere else
     if (!isValidDir(currPoint, updatedDir)) {
-      if(minDir !== Direction.NONE && isValidDir(currPoint, minDir)) {
+      // Use minDir if maxDir is invalid
+      if (minDir !== Direction.NONE && isValidDir(currPoint, minDir)) {
         updatedDir = minDir;
         updatedDist = minDistAbs;
       } else {
