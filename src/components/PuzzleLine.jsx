@@ -106,7 +106,7 @@ function PuzzleLine({ puzzle, width }) {
         ? Math.abs(p1.x - p2.x)
         : Math.abs(p1.y - p2.y);
 
-    return PIECESZ * dist;
+    return (EDGESEGMAX / 2) * dist;
   };
 
   const handleMouseMove = (e) => {
@@ -160,9 +160,6 @@ function PuzzleLine({ puzzle, width }) {
 
     // Replace NONE direction
     if (updatedDir === Direction.NONE) {
-      if (!isValidDir(currPoint, maxDir)) {
-        return;
-      }
       updatedDir = maxDir;
     }
 
