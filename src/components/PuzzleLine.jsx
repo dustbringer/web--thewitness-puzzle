@@ -112,7 +112,6 @@ function PuzzleLine({ puzzle, width }) {
   const handleMouseMove = (e) => {
     // TODO: clicking escape should remove all line segments
     // TODO: end of puzzle
-    // TODO: changing direction at edge flicks out into edge
     // TODO: scale movement speed (can be used as sensitivity setting)
 
     const x = capVal(e.movementX, moveCap);
@@ -182,7 +181,7 @@ function PuzzleLine({ puzzle, width }) {
     updatedDist += distDiff;
 
     // FIXME: probably needs refactoring
-    if (updatedDist < 0) {
+    if (updatedDist <= 0) {
       if (sameAxis(maxDir, updatedDir) && !isValidDir(currPoint, maxDir)) {
         updatedDist = 0;
       } else if (isValidDir(currPoint, maxDir)) {
@@ -248,7 +247,12 @@ function PuzzleLine({ puzzle, width }) {
 
     // FIXME: this probably should be somewhere else
     if (!isValidDir(currPoint, updatedDir)) {
-      updatedDist = 0;
+      if(minDir !== Direction.NONE && isValidDir(currPoint, minDir)) {
+        updatedDir = minDir;
+        updatedDist = minDistAbs;
+      } else {
+        updatedDist = 0;
+      }
     }
 
     /*
