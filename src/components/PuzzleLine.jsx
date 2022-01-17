@@ -69,8 +69,8 @@ function PuzzleLine({ puzzle, width }) {
         (puzzle.isVertexInGrid(nextP.x, nextP.y) ||
           puzzle.isEdgeInGrid(nextP.x, nextP.y)) &&
         !puzzle.isEmpty(nextP.x, nextP.y)) ||
-        // TODO: account for diagonals
-        // needs to check p before nextP is set
+      // TODO: account for diagonals
+      // needs to check p before nextP is set
       (puzzle.isEnd(nextP.x, nextP.y) && dir === endDir(nextP))
     );
   };
@@ -95,7 +95,7 @@ function PuzzleLine({ puzzle, width }) {
     if (dir === Direction.NONE) return null;
 
     let newPoint = pointInDir(p, dir);
-    while (puzzle.isInGrid(newPoint.x, newPoint.y)) {
+    while (newPoint && puzzle.isInGrid(newPoint.x, newPoint.y)) {
       if (
         puzzle.isVertexInGrid(newPoint.x, newPoint.y) ||
         puzzle.isEnd(newPoint.x, newPoint.y)
@@ -116,20 +116,17 @@ function PuzzleLine({ puzzle, width }) {
 
   const containsPoint = (pArr, p) => pArr.some((e) => pointEquals(e, p));
 
-  // potentially unnecessary functions
-  const isSharedAxis = (p1, p2) => p1.x === p2.x || p1.y === p2.y;
-
   /*
-  Returns the piece distance between two points on a shared axis
-  */
-  const sharedAxisDist = (p1, p2) => {
-    if (p1 === null || p2 === null) return;
-
+   * Returns the distance (wrt EDGESEGMAX) between points on the larger axis.
+   *
+   * If the points share a coordinate, returns the point distance between
+   * two points on a shared axis. (We are only using it for this case)
+   */
+  const greaterAxisDist = (p1, p2) => {
     const dist =
       Math.abs(p1.x - p2.x) > Math.abs(p1.y - p2.y)
         ? Math.abs(p1.x - p2.x)
         : Math.abs(p1.y - p2.y);
-
     return (EDGESEGMAX / 2) * dist;
   };
 
@@ -177,17 +174,18 @@ function PuzzleLine({ puzzle, width }) {
     let nextVertex =
       currPoint !== null ? vertInDir(currPoint, updatedDir) : null;
 
-    // Replace NONE direction
+    /* Replace NONE direction */
     if (updatedDir === Direction.NONE) {
       updatedDir = maxDir;
     }
 
-    // Turn assist (maxDir perpendicular to edge)
+    /* Turn assist (maxDir perpendicular to edge) */
     if (
       !isSameAxis(maxDir, updatedDir) &&
       nextVertex !== null &&
       isValidDir(nextVertex, maxDir)
     ) {
+      // TODO: Adjust the speed of this, feels too aggressive (maybe scale the value: Math.floor(maxDistAbs / 2))
       distDiff =
         (updatedDist > EDGESEGMAX / 2 ? 1 : -1) * capVal(maxDistAbs, perpCap);
       if (puzzle.isEdgeInGrid(currPoint.x, currPoint.y)) {
@@ -197,7 +195,7 @@ function PuzzleLine({ puzzle, width }) {
 
     updatedDist += distDiff;
 
-    // Changing direction at vertex; prevent invalid movements
+    /* Changing direction at vertex; Prevent invalid movements */
     if (updatedDist <= 0) {
       // Line moved backwards past vertex
 
@@ -216,7 +214,7 @@ function PuzzleLine({ puzzle, width }) {
         updatedDist = 0;
       }
     } else if (
-      updatedDist >= sharedAxisDist(currPoint, nextVertex) &&
+      updatedDist >= greaterAxisDist(currPoint, nextVertex) &&
       isValidDir(nextVertex, maxDir)
     ) {
       // Line moved forwards past vertex, and point in movement direction exists
@@ -224,9 +222,12 @@ function PuzzleLine({ puzzle, width }) {
       updatedDir = maxDir;
     }
 
-    // Self collision
-    // FIXME: probably needs refactoring
-    // NOTE: POINT EXISTENCE MUST BE CHECKED BEFORE VERTEX
+    /* Self collision */
+
+    /*
+     * The next point, if it is part of the line
+     * NOTE: POINT EXISTENCE MUST BE CHECKED BEFORE VERTEX
+     */
     const nextPointInLine = containsPoint(linePointsRef.current, nextPoint)
       ? nextPoint
       : containsPoint(linePointsRef.current, nextVertex)
@@ -238,38 +239,35 @@ function PuzzleLine({ puzzle, width }) {
         linePointsRef.current.length > 0 &&
         pointEquals(nextPointInLine, linePointsRef.current[0]) &&
         isLineCrossingStart(
-          sharedAxisDist(currPoint, nextPointInLine),
+          greaterAxisDist(currPoint, nextPointInLine),
           updatedDist + distDiff
         )
       ) {
         updatedDist =
-          sharedAxisDist(currPoint, nextPointInLine) - LINERAD - STARTRAD;
+          greaterAxisDist(currPoint, nextPointInLine) - LINERAD - STARTRAD;
       } else if (isLineCrossingPoint(updatedDist + distDiff)) {
         // move will cross over into next point
         updatedDist = EDGESEGMAX - LINERAD * 2;
       }
     }
 
-    // check if new point should be added
-    // FIXME: probably needs refactoring
+    /* Check if new point should be added */
     if (
       nextVertex !== null &&
-      !pointEquals(currPoint, nextVertex) &&
-      isSharedAxis(currPoint, nextVertex) &&
-      updatedDist >= sharedAxisDist(currPoint, nextVertex)
+      updatedDist >= greaterAxisDist(currPoint, nextVertex)
     ) {
       setLinePoints((points) => [...points, nextVertex]);
       // possibly assign this distance to a variable
-      updatedDist %= sharedAxisDist(currPoint, nextVertex);
+      updatedDist %= greaterAxisDist(currPoint, nextVertex);
       prevPoint = currPoint;
       currPoint = nextVertex;
       console.log("added point");
     }
 
-    // FIXME: this probably should be somewhere else
+    /* Prevent further invalid movements */
     if (!isValidDir(currPoint, updatedDir)) {
-      // Use minDir if maxDir is invalid
       if (minDir !== Direction.NONE && isValidDir(currPoint, minDir)) {
+        // Move in minDir if maxDir is invalid
         updatedDir = minDir;
         updatedDist = minDistAbs;
       } else {
@@ -278,17 +276,18 @@ function PuzzleLine({ puzzle, width }) {
     }
 
     /*
+     * Check if last point needs removing
+     *
      * When we change direction at a vertex, isBacktrackingPoint checks if
      * the new direction is going back into the previously drawn edge segment.
      * If so, remove the point we backtracked from and update the values of
      * the current line segment to feel like it is controlling the removed edge.
      */
-    // check if last point needs removing
     if (isBacktrackingPoint(currPoint, prevPoint, updatedDir)) {
       setLinePoints((points) => {
         return points.slice(0, points.length - 1);
       });
-      updatedDist = sharedAxisDist(currPoint, prevPoint) - updatedDist;
+      updatedDist = greaterAxisDist(currPoint, prevPoint) - updatedDist;
       updatedDir = reverseDir(updatedDir);
       console.log("removed point");
     }
