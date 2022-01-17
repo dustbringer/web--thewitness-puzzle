@@ -14,7 +14,6 @@ function Home() {
   let p = new PuzzleClass(4, 4);
   p.addStart(8, 4);
   p.addStart(4, 4);
-  p.addStart(0, 8);
   p.addStart(0, 0);
   p.addStart(6, 7);
   p.addStart(1, 6);
@@ -22,6 +21,11 @@ function Home() {
   p.addEnd(0, 2);
   p.addEnd(0, 3);
   p.addEnd(0, 4);
+  p.addEnd(0, 8);
+  p.addEnd(8, 0);
+  p.addEnd(8, 8);
+  p.setEndOrientation(0, 8, Orientation.DIAGONAL);
+  p.setEndOrientation(8, 8, Orientation.HORIZONTAL);
 
   // p.addEdgSym(0, 1, EdgSym.BREAK);
   // p.addEdgSym(1, 0, EdgSym.BREAK);

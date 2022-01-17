@@ -23,6 +23,7 @@ import {
   PIECESZ,
   STARTRAD as _STARTRAD,
   LINEWIDTH as _LINEWIDTH,
+  ENDLENGTH as _ENDLENGTH,
   BREAKWIDTH as _BREAKWIDTH,
 } from "./PuzzlePiece/info";
 
@@ -30,6 +31,7 @@ const pieceszScale = 2;
 const EDGESEGMAX = PIECESZ * pieceszScale;
 const LINERAD = (_LINEWIDTH / 2) * pieceszScale;
 const STARTRAD = _STARTRAD * pieceszScale;
+const ENDLENGTH = _ENDLENGTH * pieceszScale;
 const BREAKWIDTH = _BREAKWIDTH * pieceszScale;
 const moveCap = 60;
 const perpCap = 30;
@@ -70,8 +72,7 @@ function PuzzleLine({ puzzle, width }) {
           puzzle.isEdgeInGrid(nextP.x, nextP.y)) &&
         !puzzle.isEmpty(nextP.x, nextP.y)) ||
       // TODO: account for diagonals
-      // needs to check p before nextP is set
-      (puzzle.isEnd(nextP.x, nextP.y) && dir === endDir(nextP))
+      (puzzle.isEnd(p.x, p.y) && dir === endDir(p))
     );
   };
 
@@ -183,6 +184,7 @@ function PuzzleLine({ puzzle, width }) {
     if (
       !isSameAxis(maxDir, updatedDir) &&
       nextVertex !== null &&
+      !puzzle.isEnd(nextVertex.x, nextVertex.y) &&
       isValidDir(nextVertex, maxDir)
     ) {
       // TODO: Adjust the speed of this, feels too aggressive (maybe scale the value: Math.floor(maxDistAbs / 2))
@@ -214,12 +216,14 @@ function PuzzleLine({ puzzle, width }) {
         updatedDist = 0;
       }
     } else if (
+      nextVertex &&
       updatedDist >= greaterAxisDist(currPoint, nextVertex) &&
       isValidDir(nextVertex, maxDir)
     ) {
       // Line moved forwards past vertex, and point in movement direction exists
 
       updatedDir = maxDir;
+      console.log(updatedDir);
     }
 
     /* Self collision */
