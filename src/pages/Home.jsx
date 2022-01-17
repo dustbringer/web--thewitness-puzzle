@@ -30,12 +30,10 @@ function Home() {
   p.setEndOrientation(0, 8, Orientation.DIAGONAL);
   p.setEndOrientation(8, 8, Orientation.HORIZONTAL);
 
-  // p.addEdgSym(0, 1, EdgSym.BREAK);
-  // p.addEdgSym(1, 0, EdgSym.BREAK);
-  // p.addEdgSym(2, 1, EdgSym.BREAK);
-  // p.addEdgSym(1, 2, EdgSym.BREAK);
-  // p.addEdgSym(2, 3, EdgSym.BREAK);
-  // p.addEdgSym(3, 2, EdgSym.BREAK);
+  p.addEdgSym(5, 2, EdgSym.BREAK);
+  p.addEdgSym(6, 1, EdgSym.BREAK);
+  p.addEdgSym(7, 2, EdgSym.BREAK);
+
   p.addVtxSym(0, 2, VtxSym.DOT);
   p.addSpcSym(1, 1, SpcSym.SUN);
 
