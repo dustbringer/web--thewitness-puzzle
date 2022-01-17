@@ -127,13 +127,16 @@ class Puzzle {
   }
 
   getEndOrientation(x, y) {
-    if (
-      !this.isEnd(x, y) ||
-      !this.isCornerOfGrid(x, y) ||
+    if (!this.isEnd(x, y)) {
+      return null;
+    } else if (!this.isCornerOfGrid(x, y)) {
+      if(x === 0 || x === this.gridw - 1) return Orientation.HORIZONTAL;
+      else if (y === 0 || y === this.gridh - 1) return Orientation.VERTICAL;
+    } else if (
       !this.grid[x][y].hasOwnProperty("endOrientation") ||
       !(this.grid[x][y].endOrientation in Object.values(Orientation))
     ) {
-      return null;
+      return Orientation.VERTICAL;
     }
     return this.grid[x][y].endOrientation;
   }

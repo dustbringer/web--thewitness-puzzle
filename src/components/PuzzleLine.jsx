@@ -17,6 +17,7 @@ import {
   isHorizontal,
 } from "../util/directionUtil";
 import { getViewboxSize } from "../util/puzzleDisplayUtil";
+import Orientation from "../enums/Orientation";
 import { VtxSym, SpcSym, EdgSym } from "../enums/Sym";
 import {
   PIECESZ,
@@ -30,7 +31,6 @@ const EDGESEGMAX = PIECESZ * pieceszScale;
 const LINERAD = (_LINEWIDTH / 2) * pieceszScale;
 const STARTRAD = _STARTRAD * pieceszScale;
 const BREAKWIDTH = _BREAKWIDTH * pieceszScale;
-const turnLeeway = 30;
 const moveCap = 60;
 const perpCap = 30;
 
@@ -44,13 +44,34 @@ function PuzzleLine({ puzzle, width }) {
 
   const pointEquals = (p1, p2) => p1 && p2 && p1.x === p2.x && p1.y === p2.y;
 
+  const endDir = (end) => {
+    const o = puzzle.getEndOrientation(end.x, end.y);
+    if (o === null) return null;
+
+    // Orientation.VERTICAL check first as VERTICAL is default
+    if (o === Orientation.VERTICAL) {
+      if (end.y === 0) return Direction.UP;
+      else return Direction.DOWN;
+    } else if (o === Orientation.HORIZONTAL) {
+      if (end.x === 0) return Direction.LEFT;
+      else return Direction.RIGHT;
+    } else {
+      // TODO: account for Orientation.DIAGONAL
+      console.log("Direction diagonal");
+      return Direction.NONE;
+    }
+  };
+
   const isValidDir = (p, dir) => {
     const nextP = pointInDir(p, dir);
     return (
-      nextP !== null &&
-      (puzzle.isVertexInGrid(nextP.x, nextP.y) ||
-        puzzle.isEdgeInGrid(nextP.x, nextP.y)) &&
-      !puzzle.isEmpty(nextP.x, nextP.y)
+      (nextP !== null &&
+        (puzzle.isVertexInGrid(nextP.x, nextP.y) ||
+          puzzle.isEdgeInGrid(nextP.x, nextP.y)) &&
+        !puzzle.isEmpty(nextP.x, nextP.y)) ||
+        // TODO: account for diagonals
+        // needs to check p before nextP is set
+      (puzzle.isEnd(nextP.x, nextP.y) && dir === endDir(nextP))
     );
   };
 
@@ -75,7 +96,10 @@ function PuzzleLine({ puzzle, width }) {
 
     let newPoint = pointInDir(p, dir);
     while (puzzle.isInGrid(newPoint.x, newPoint.y)) {
-      if (puzzle.isVertexInGrid(newPoint.x, newPoint.y)) {
+      if (
+        puzzle.isVertexInGrid(newPoint.x, newPoint.y) ||
+        puzzle.isEnd(newPoint.x, newPoint.y)
+      ) {
         return newPoint;
       }
       newPoint = pointInDir(newPoint, dir);
