@@ -76,14 +76,12 @@ function PuzzleLine({ puzzle, width }) {
     );
   };
 
-  const isLineCrossingPoint = (dist) => dist + LINERAD > EDGESEGMAX - LINERAD;
+  const distToPoint = EDGESEGMAX - LINERAD * 2;
 
   // Start could be on an edge
-  const isLineCrossingStart = (distToLine, dist) =>
-    dist + LINERAD > distToLine - STARTRAD;
+  const distToStart = (distToLine) => distToLine - STARTRAD - LINERAD;
 
-  const isLineCrossingBreak = (dist) =>
-    dist + LINERAD > (EDGESEGMAX - BREAKWIDTH) / 2;
+  const distToBreak = (EDGESEGMAX - BREAKWIDTH) / 2 - LINERAD;
 
   const pointInDir = (p, dir) =>
     dir !== Direction.NONE && p !== null
@@ -241,18 +239,24 @@ function PuzzleLine({ puzzle, width }) {
       if (
         linePointsRef.current.length > 0 &&
         pointEquals(nextPointInLine, linePointsRef.current[0]) &&
-        isLineCrossingStart(
-          greaterAxisDist(currPoint, nextPointInLine),
-          updatedDist + distDiff
-        )
+        updatedDist > distToStart(greaterAxisDist(currPoint, nextPointInLine))
       ) {
-        updatedDist =
-          greaterAxisDist(currPoint, nextPointInLine) - LINERAD - STARTRAD;
-      } else if (isLineCrossingPoint(updatedDist + distDiff)) {
-        // move will cross over into next point
-        updatedDist = EDGESEGMAX - LINERAD * 2;
+        // Line crossing start
+        updatedDist = distToStart(greaterAxisDist(currPoint, nextPointInLine));
+      } else if (updatedDist > distToPoint) {
+        // Line crossing point in line
+        updatedDist = distToPoint;
       }
     }
+
+    /* Break collision */
+    // if (
+    //   nextPoint &&
+    //   puzzle.checkSymbol(nextPoint.x, nextPoint.y, EdgSym.BREAK) &&
+    //   isLineCrossingBreak(updatedDist)
+    // ) {
+    //   updatedDist =
+    // }
 
     /* Check if new point should be added */
     if (
@@ -271,7 +275,7 @@ function PuzzleLine({ puzzle, width }) {
       puzzle.isEnd(currPoint.x, currPoint.y) &&
       updatedDir === endDir(currPoint)
     ) {
-      if(updatedDist > ENDLENGTH) {
+      if (updatedDist > ENDLENGTH) {
         updatedDist = ENDLENGTH;
       }
     }

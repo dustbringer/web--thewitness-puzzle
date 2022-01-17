@@ -70,7 +70,9 @@ class Puzzle {
       exists(x + 1, y) + exists(x - 1, y) + exists(x, y + 1) + exists(x, y - 1)
     );
   }
-  gridPoint = (p) => (this.isInGrid(p.x, p.y) ? this.grid[p.x][p.y] : null);
+  gridPoint(x, y) {
+    return this.isInGrid(x, y) ? this.grid[x][y] : null;
+  }
 
   // Methods
   addStart(x, y) {
@@ -130,7 +132,7 @@ class Puzzle {
     if (!this.isEnd(x, y)) {
       return null;
     } else if (!this.isCornerOfGrid(x, y)) {
-      if(x === 0 || x === this.gridw - 1) return Orientation.HORIZONTAL;
+      if (x === 0 || x === this.gridw - 1) return Orientation.HORIZONTAL;
       else if (y === 0 || y === this.gridh - 1) return Orientation.VERTICAL;
     } else if (
       !this.grid[x][y].hasOwnProperty("endOrientation") ||
