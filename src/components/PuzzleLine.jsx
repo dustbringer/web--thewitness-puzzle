@@ -12,7 +12,7 @@ import {
   getDirY,
   getDirInfo,
   reverseDir,
-  sameAxis,
+  isSameAxis,
   dirToSign,
   isHorizontal,
 } from "../util/directionUtil";
@@ -56,6 +56,7 @@ function PuzzleLine({ puzzle, width }) {
 
   const isLineCrossingPoint = (dist) => dist + LINERAD > EDGESEGMAX - LINERAD;
 
+  // Start could be on an edge
   const isLineCrossingStart = (distToLine, dist) =>
     dist + LINERAD > distToLine - STARTRAD;
 
@@ -159,7 +160,7 @@ function PuzzleLine({ puzzle, width }) {
 
     // Turn assist (maxDir perpendicular to edge)
     if (
-      !sameAxis(maxDir, updatedDir) &&
+      !isSameAxis(maxDir, updatedDir) &&
       nextVertex !== null &&
       isValidDir(nextVertex, maxDir)
     ) {
@@ -172,37 +173,36 @@ function PuzzleLine({ puzzle, width }) {
 
     updatedDist += distDiff;
 
-    // FIXME: probably needs refactoring
+    // Changing direction at vertex; prevent invalid movements
     if (updatedDist <= 0) {
-      if (sameAxis(maxDir, updatedDir) && !isValidDir(currPoint, maxDir)) {
-        updatedDist = 0;
-      } else if (isValidDir(currPoint, maxDir)) {
+      // Line moved backwards past vertex
+
+      if (isValidDir(currPoint, maxDir)) {
+        // Any mouse direction, next point exists
         updatedDir = maxDir;
         updatedDist = Math.abs(updatedDist);
       } else if (
-        !sameAxis(maxDir, updatedDir) &&
-        !isValidDir(currPoint, maxDir)
+        !isSameAxis(maxDir, updatedDir) &&
+        isValidDir(currPoint, reverseDir(updatedDir))
       ) {
-        if (isValidDir(currPoint, reverseDir(updatedDir))) {
-          updatedDir = reverseDir(updatedDir);
-          updatedDist = Math.abs(updatedDist);
-        } else {
-          updatedDist = 0;
-        }
+        // No next point in mouse direction, but next point exists in edge direction
+        updatedDir = reverseDir(updatedDir);
+        updatedDist = Math.abs(updatedDist);
+      } else {
+        updatedDist = 0;
       }
     } else if (
       updatedDist >= sharedAxisDist(currPoint, nextVertex) &&
       isValidDir(nextVertex, maxDir)
     ) {
-      // Overshot turn
-      updatedDir = maxDir;
+      // Line moved forwards past vertex, and point in movement direction exists
 
-      // Out of bounds is handled later
+      updatedDir = maxDir;
     }
 
     // Self collision
     // FIXME: probably needs refactoring
-    // NOTE: POINT MUST BE CHECKED BEFORE VERTEX
+    // NOTE: POINT EXISTENCE MUST BE CHECKED BEFORE VERTEX
     const nextPointInLine = containsPoint(linePointsRef.current, nextPoint)
       ? nextPoint
       : containsPoint(linePointsRef.current, nextVertex)

@@ -26,6 +26,7 @@ export const getDirInfo = (x, y, currDir) => {
   const yDir = getDirY(y);
 
   let maxDir, minDir, maxDist, minDist;
+  // Doesnt handle currDir===Direciton.NONE separately
   if (xAbs > yAbs || (xAbs === yAbs && isHorizontal(currDir))) {
     maxDir = getDirX(x);
     minDir = getDirY(y);
@@ -55,7 +56,7 @@ export const getDirInfo = (x, y, currDir) => {
 };
 
 export const reverseDir = (dir) => (dir < 0 ? Direction.NONE : (dir + 2) % 4);
-export const sameAxis = (d1, d2) => d1 >= 0 && d2 >= 0 && d1 % 2 === d2 % 2;
+export const isSameAxis = (d1, d2) => d1 >= 0 && d2 >= 0 && d1 % 2 === d2 % 2;
 export const isVertical = (dir) => dir >= 0 && !(dir % 2);
 export const isHorizontal = (dir) => dir >= 0 && dir % 2;
 
