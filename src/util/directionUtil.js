@@ -58,5 +58,12 @@ export const reverseDir = (dir) => (dir < 0 ? Direction.NONE : (dir + 2) % 4);
 export const sameAxis = (d1, d2) => d1 >= 0 && d2 >= 0 && d1 % 2 === d2 % 2;
 export const isVertical = (dir) => dir >= 0 && !(dir % 2);
 export const isHorizontal = (dir) => dir >= 0 && dir % 2;
+
+// export const dirToSign = (dir) => {
+//   if (dir === Direction.RIGHT || dir === Direction.DOWN) return 1;
+//   else if (dir === Direction.LEFT || dir === Direction.UP) return -1;
+//   else return 0;
+// };
+// This is illegible and potentially slow, but works nicely over all Z/4Z
 export const dirToSign = (dir) =>
   dir < 0 ? 0 : Math.sign(((dir + 1) % 4) - (dir % 2 ? 1 : 2));
