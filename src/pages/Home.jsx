@@ -27,7 +27,6 @@ function Home() {
   p.addEnd(0, 8);
   p.addEnd(8, 0);
   p.addEnd(8, 8);
-  p.setEndOrientation(0, 8, Orientation.DIAGONAL);
   p.setEndOrientation(8, 8, Orientation.HORIZONTAL);
 
   p.addEdgSym(5, 2, EdgSym.BREAK);

@@ -130,7 +130,7 @@ class Puzzle {
 
   getEndOrientation(x, y) {
     if (!this.isEnd(x, y)) {
-      return null;
+      return;
     } else if (!this.isCornerOfGrid(x, y)) {
       if (x === 0 || x === this.gridw - 1) return Orientation.HORIZONTAL;
       else if (y === 0 || y === this.gridh - 1) return Orientation.VERTICAL;
@@ -147,7 +147,8 @@ class Puzzle {
     if (
       !this.isEnd(x, y) ||
       !this.isCornerOfGrid(x, y) ||
-      !(o in Object.values(Orientation))
+      !(o in Object.values(Orientation)) ||
+      o === Orientation.DIAGONAL
     ) {
       throw new Error("Puzzle Error: Failed to set end orientation");
     }

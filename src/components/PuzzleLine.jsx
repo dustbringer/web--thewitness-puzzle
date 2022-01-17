@@ -48,7 +48,7 @@ function PuzzleLine({ puzzle, width }) {
 
   const endDir = (end) => {
     const o = puzzle.getEndOrientation(end.x, end.y);
-    if (o === null) return null;
+    if (o === undefined) return;
 
     // Orientation.VERTICAL check first as VERTICAL is default
     if (o === Orientation.VERTICAL) {
@@ -58,9 +58,7 @@ function PuzzleLine({ puzzle, width }) {
       if (end.x === 0) return Direction.LEFT;
       else return Direction.RIGHT;
     } else {
-      // TODO: account for Orientation.DIAGONAL
-      console.log("Direction diagonal");
-      return Direction.NONE;
+      return;
     }
   };
 
@@ -71,7 +69,6 @@ function PuzzleLine({ puzzle, width }) {
         (puzzle.isVertexInGrid(nextP.x, nextP.y) ||
           puzzle.isEdgeInGrid(nextP.x, nextP.y)) &&
         !puzzle.isEmpty(nextP.x, nextP.y)) ||
-      // TODO: account for diagonals
       (p !== null && puzzle.isEnd(p.x, p.y) && dir === endDir(p))
     );
   };
@@ -131,7 +128,6 @@ function PuzzleLine({ puzzle, width }) {
 
   const handleMouseMove = (e) => {
     // TODO: clicking escape should remove all line segments
-    // TODO: end of puzzle
     // TODO: scale movement speed (can be used as sensitivity setting)
 
     const x = capVal(e.movementX, moveCap);
@@ -179,7 +175,6 @@ function PuzzleLine({ puzzle, width }) {
       updatedDir = maxDir;
     }
 
-    // TODO: diagonal end not accounted for
     /* Turn assist (maxDir perpendicular to edge) */
     if (currPoint && !isSameAxis(maxDir, updatedDir)) {
       if (
@@ -279,7 +274,6 @@ function PuzzleLine({ puzzle, width }) {
       updatedDist %= greaterAxisDist(currPoint, nextVertex);
       prevPoint = currPoint;
       currPoint = nextVertex;
-      console.log("added point");
     }
 
     if (
@@ -316,7 +310,6 @@ function PuzzleLine({ puzzle, width }) {
       });
       updatedDist = greaterAxisDist(currPoint, prevPoint) - updatedDist;
       updatedDir = reverseDir(updatedDir);
-      console.log("removed point");
     }
 
     setCurrDist(updatedDist);
