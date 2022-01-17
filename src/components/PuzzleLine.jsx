@@ -72,7 +72,7 @@ function PuzzleLine({ puzzle, width }) {
           puzzle.isEdgeInGrid(nextP.x, nextP.y)) &&
         !puzzle.isEmpty(nextP.x, nextP.y)) ||
       // TODO: account for diagonals
-      (puzzle.isEnd(p.x, p.y) && dir === endDir(p))
+      (p !== null && puzzle.isEnd(p.x, p.y) && dir === endDir(p))
     );
   };
 
@@ -172,6 +172,7 @@ function PuzzleLine({ puzzle, width }) {
         : null;
     let nextPoint =
       currPoint !== null ? pointInDir(currPoint, updatedDir) : null;
+    // vertInDir returns any point you can turn at, including edges with end segments
     let nextVertex =
       currPoint !== null ? vertInDir(currPoint, updatedDir) : null;
 
@@ -180,18 +181,28 @@ function PuzzleLine({ puzzle, width }) {
       updatedDir = maxDir;
     }
 
+    // TODO: diagonal end not accounted for
     /* Turn assist (maxDir perpendicular to edge) */
-    if (
-      !isSameAxis(maxDir, updatedDir) &&
-      nextVertex !== null &&
-      !puzzle.isEnd(nextVertex.x, nextVertex.y) &&
-      isValidDir(nextVertex, maxDir)
-    ) {
-      // TODO: Adjust the speed of this, feels too aggressive (maybe scale the value: Math.floor(maxDistAbs / 2))
-      distDiff =
-        (updatedDist > EDGESEGMAX / 2 ? 1 : -1) * capVal(maxDistAbs, perpCap);
-      if (puzzle.isEdgeInGrid(currPoint.x, currPoint.y)) {
-        distDiff = Math.abs(distDiff);
+    if (currPoint && !isSameAxis(maxDir, updatedDir)) {
+      if (
+        puzzle.isEnd(currPoint.x, currPoint.y) &&
+        updatedDir === endDir(currPoint)
+      ) {
+        // turn assist out of end
+        distDiff += (distDiff > 0 ? 1 : -1) * capVal(maxDistAbs, perpCap);
+      } else if (
+        nextVertex !== null &&
+        isValidDir(nextVertex, maxDir) &&
+        isValidDir(currPoint, maxDir)
+      ) {
+        // TODO: Adjust the speed of this, feels too aggressive (maybe scale the value: Math.floor(maxDistAbs / 2))
+        distDiff =
+          (updatedDist > greaterAxisDist(currPoint, nextVertex) / 2 ? 1 : -1) *
+          capVal(maxDistAbs, perpCap);
+      } else if (nextVertex !== null && isValidDir(nextVertex, maxDir)) {
+        distDiff = capVal(maxDistAbs, perpCap);
+      } else if (isValidDir(currPoint, maxDir)) {
+        distDiff = -capVal(maxDistAbs, perpCap);
       }
     }
 
@@ -271,7 +282,7 @@ function PuzzleLine({ puzzle, width }) {
       puzzle.isEnd(currPoint.x, currPoint.y) &&
       updatedDir === endDir(currPoint)
     ) {
-      if(updatedDist > ENDLENGTH) {
+      if (updatedDist > ENDLENGTH) {
         updatedDist = ENDLENGTH;
       }
     }
