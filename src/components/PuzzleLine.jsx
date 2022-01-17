@@ -250,13 +250,13 @@ function PuzzleLine({ puzzle, width }) {
     }
 
     /* Break collision */
-    // if (
-    //   nextPoint &&
-    //   puzzle.checkSymbol(nextPoint.x, nextPoint.y, EdgSym.BREAK) &&
-    //   isLineCrossingBreak(updatedDist)
-    // ) {
-    //   updatedDist =
-    // }
+    if (
+      nextPoint &&
+      puzzle.checkSymbol(nextPoint.x, nextPoint.y, EdgSym.BREAK) &&
+      updatedDist > distToBreak
+    ) {
+      updatedDist = distToBreak;
+    }
 
     /* Check if new point should be added */
     if (
