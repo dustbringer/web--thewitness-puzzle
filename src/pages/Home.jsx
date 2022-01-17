@@ -18,9 +18,12 @@ function Home() {
   p.addStart(6, 7);
   p.addStart(1, 6);
   p.addStart(7, 8);
+  p.addEnd(3, 0);
   p.addEnd(0, 2);
   p.addEnd(0, 3);
   p.addEnd(0, 4);
+  p.addEnd(5, 8);
+  p.addEnd(8, 1);
   p.addEnd(0, 8);
   p.addEnd(8, 0);
   p.addEnd(8, 8);

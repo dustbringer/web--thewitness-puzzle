@@ -223,7 +223,6 @@ function PuzzleLine({ puzzle, width }) {
       // Line moved forwards past vertex, and point in movement direction exists
 
       updatedDir = maxDir;
-      console.log(updatedDir);
     }
 
     /* Self collision */
@@ -266,6 +265,15 @@ function PuzzleLine({ puzzle, width }) {
       prevPoint = currPoint;
       currPoint = nextVertex;
       console.log("added point");
+    }
+
+    if (
+      puzzle.isEnd(currPoint.x, currPoint.y) &&
+      updatedDir === endDir(currPoint)
+    ) {
+      if(updatedDist > ENDLENGTH) {
+        updatedDist = ENDLENGTH;
+      }
     }
 
     /* Prevent further invalid movements */
