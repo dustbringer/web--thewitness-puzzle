@@ -1,7 +1,7 @@
 import * as React from "react";
 import { styled } from "@mui/material/styles";
 
-import { getPixelSize } from "../util/puzzleDisplayUtil";
+import { getPixelSize } from "../../../util/puzzleDisplayUtil";
 
 const StartButton = styled("div")`
   width: ${(props) => props.relativestartrad * 2}px;

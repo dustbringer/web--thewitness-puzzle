@@ -1,12 +1,12 @@
 import * as React from "react";
 import { styled } from "@mui/material/styles";
 
-import FixedSVG from "./FixedSVG";
+import FixedSVG from "../../FixedSVG";
 
-import Puzzle from "../classes/Puzzle";
-import Direction from "../enums/Direction";
-import { getViewboxSize } from "../util/puzzleDisplayUtil";
-import { PIECESZ, LINEWIDTH, STARTRAD } from "./PuzzlePiece/info";
+import Puzzle from "../../../classes/Puzzle";
+import Direction from "../../../enums/Direction";
+import { getViewboxSize } from "../../../util/puzzleDisplayUtil";
+import { PIECESZ, LINEWIDTH, STARTRAD } from "../../PuzzlePiece/info";
 
 function PuzzleLineRaw({ puzzle, width, points, currDir, currDist }) {
   if (!puzzle) {

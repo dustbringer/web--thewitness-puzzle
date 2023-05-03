@@ -88,6 +88,8 @@ class Puzzle {
 
     if (this.grid[x][y]) this.grid[x][y].isStart = true;
     else this.grid[x][y] = { isStart: true };
+
+    return this;
   }
 
   removeStart(x, y) {
@@ -96,6 +98,8 @@ class Puzzle {
     }
     this.grid[x][y].isStart = false;
     this.start = this.start.filter((e) => !(e.x === x && e.y === y));
+
+    return this;
   }
 
   addEnd(x, y) {
@@ -118,6 +122,8 @@ class Puzzle {
     }
     if (this.isCornerOfGrid(x, y))
       this.grid[x][y].endOrientation = Orientation.VERTICAL;
+
+    return this;
   }
 
   removeEnd(x, y) {
@@ -126,6 +132,8 @@ class Puzzle {
     }
     this.grid[x][y].isEnd = false;
     this.end = this.end.filter((e) => !(e.x === x && e.y === y));
+
+    return this;
   }
 
   getEndOrientation(x, y) {
@@ -154,6 +162,8 @@ class Puzzle {
     }
 
     this.grid[x][y].endOrientation = o;
+
+    return this;
   }
 
   addVtxSym(x, y, sym) {
@@ -167,6 +177,8 @@ class Puzzle {
 
     if (this.grid[x][y]) this.grid[x][y].sym = sym;
     else this.grid[x][y] = { sym };
+
+    return this;
   }
 
   addSpcSym(x, y, sym) {
@@ -180,6 +192,8 @@ class Puzzle {
 
     if (this.grid[x][y]) this.grid[x][y].sym = sym;
     else this.grid[x][y] = { sym };
+
+    return this;
   }
 
   addEdgSym(x, y, sym) {
@@ -194,6 +208,8 @@ class Puzzle {
 
     if (this.grid[x][y]) this.grid[x][y].sym = sym;
     else this.grid[x][y] = { sym };
+
+    return this;
   }
 
   removeSym(x, y) {
@@ -202,6 +218,8 @@ class Puzzle {
     }
 
     if (this.grid[x][y]) delete this.grid[x][y].sym;
+
+    return this;
   }
 
   addEdge(x, y) {
@@ -215,6 +233,8 @@ class Puzzle {
       if (!this.isVertexInGrid(v.x, v.y)) return;
       if (!this.grid[v.x][v.y]) this.grid[v.x][v.y] = {};
     });
+
+    return this;
   }
 
   removeEdge(x, y) {
@@ -234,6 +254,8 @@ class Puzzle {
         this.start = this.start.filter((e) => !(e.x === v.x && e.y === v.y));
       }
     });
+
+    return this;
   }
 
   // Not needed: Included automatically when add/remove edges

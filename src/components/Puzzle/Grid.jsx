@@ -1,11 +1,11 @@
 import * as React from "react";
 import { styled } from "@mui/material/styles";
 
-import FixedSVG from "./FixedSVG";
-import PuzzlePiece from "./PuzzlePiece";
+import FixedSVG from "../FixedSVG";
+import PuzzlePiece from "../PuzzlePiece";
 
-import Puzzle from "../classes/Puzzle";
-import { getViewboxSize } from "../util/puzzleDisplayUtil";
+import Puzzle from "../../classes/Puzzle";
+import { getViewboxSize } from "../../util/puzzleDisplayUtil";
 
 function PuzzleGrid({ puzzle, width }) {
   if (!puzzle) {

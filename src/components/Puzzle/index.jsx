@@ -1,8 +1,8 @@
 import * as React from "react";
 import { styled } from "@mui/material/styles";
 
-import PuzzleGrid from "./PuzzleGrid";
-import PuzzleLine from "./PuzzleLine";
+import PuzzleGrid from "./Grid";
+import PuzzleLine from "./Line";
 
 const Root = styled("div")`
   position: relative;
